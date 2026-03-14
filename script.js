@@ -1251,27 +1251,30 @@ function setupLocationPrePrompt() {
 
   // already allowed this session
   if (sessionSaved === "allow") {
-    backdrop.classList.add("hidden");
-    revealMarkers();
-    getUserLocation();
-    startMapGpsShare();
-    return;
-  }
+  backdrop.classList.add("hidden");
+  backdrop.style.pointerEvents = "none";
+  revealMarkers();
+  getUserLocation();
+  startMapGpsShare();
+  return;
+}
 
   // permanently denied
   if (permanentSaved === "deny_permanent") {
-    backdrop.classList.add("hidden");
-    revealMarkers();
-    return;
-  }
+  backdrop.classList.add("hidden");
+  backdrop.style.pointerEvents = "none";
+  revealMarkers();
+  return;
+}
 
   // show prompt
   backdrop.classList.remove("hidden");
 
   function closePrompt() {
-    backdrop.classList.add("hidden");
-    revealMarkers();
-  }
+  backdrop.classList.add("hidden");
+  backdrop.style.pointerEvents = "none";
+  revealMarkers();
+}
 
   // IMPORTANT: overwrite old handlers cleanly
   allowBtn.onclick = () => {
@@ -1293,6 +1296,7 @@ function openLocationPrompt() {
   const backdrop = document.getElementById("locPromptBackdrop");
   if (!backdrop) return;
 
+  backdrop.style.pointerEvents = "auto";
   backdrop.classList.remove("hidden");
 }
 
