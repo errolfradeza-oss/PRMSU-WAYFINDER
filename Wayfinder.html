@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>PRMSU Wayfinder</title>
+  <link rel="stylesheet" href="Wayfinder.css" />
+  <link rel="stylesheet" href="mobile.css" media="(max-width: 768px)" />
+</head>
+<body>
+  
+<header class="topbar">
+  <div class="topbar-left">
+    <img src="/images/WayFinder_Logo.jpg" class="banner-logo" alt="PRMSU Wayfinder"/>
+    <div class="topbar-title">
+      <!--<div class="topbar-name">PRMSU Wayfinder</div>
+      <div class="topbar-sub">Campus Navigation</div>-->
+    </div>
+  </div>
+
+  <div class="gm-pill">
+  <button id="searchToggle" class="search-icon" type="button">⌕</button>
+  <div class="search-row">
+    <input id="mapSearch" type="text" placeholder="Search Buildings..." />
+    <button id="clearSearch" type="button">✕</button>
+  </div>
+
+  <div class="search-panel" id="searchPanel"></div>
+</div>
+
+</header>
+
+<div id="sideMenu" class="side-menu">
+  <div class="menu-strip" onclick="toggleSideMenu()">☰</div>
+
+  <button onclick="openLocationPrompt()">My Location</button>
+  <button onclick="clearRoute()">Clear Route</button>
+  <!--<button onclick="routeToAdmin()">Go to Admin</button>
+
+  <div class="menu-item" onclick="toggleDepartments()">
+    <span>Departments</span>
+    <span>▶</span>
+  </div>
+
+  <button id="gyroBtn" type="button" onclick="toggleGyro()">Gyro: OFF</button>
+
+
+  <div class="side-submenu" id="departmentMenu">
+    <button onclick="goToLocation('ccit')">CCIT</button>
+    <button onclick="goToLocation('cas')">CAS</button>
+    <button onclick="goToLocation('ccje')">CCJE</button>
+    <button onclick="goToLocation('cte')">CTE</button>
+  </div> -->
+</div>
+
+<div class="zoom-slider-container">
+  <div class="zoom-label">+</div>
+  <input type="range" id="zoomSlider">
+  <div class="zoom-label">−</div>
+</div>
+
+  <div id="map"></div>
+
+<div id="dirPanel" class="direction-panel">
+  <div class="dir-strip" onclick="toggleDirectionPanel()">➤</div>
+  <!--<div id="navDistance" class="nav-distance">Remaining: —</div>-->
+
+  <div class="walk-dir">
+
+    <!-- FROM / TO BLOCK -->
+    <div class="walk-inputs">
+
+      <div class="walk-rail">
+        <span class="dot start"></span>
+        <span class="line"></span>
+        <span class="dot end"></span> 
+      </div>
+
+      <div class="walk-fields">
+        <input id="fromInput" type="text" placeholder="Your location">
+        <input id="toInput" type="text" placeholder="Choose destination">
+
+        <button class="walk-add" type="button">
+          <!--<span>＋</span> Add destination -->
+        </button>
+      </div>
+
+      <!--<button class="walk-swap" type="button" onclick="swapInputs()">⇅</button> -->
+      <button class="walk-swap" type="button" onclick="clearRoute()">✖</button>
+    </div>
+
+    <!-- ROUTE LIST -->
+    <div class="walk-routes" id="walkRoutes"></div>
+
+    <!-- TURN-BY-TURN STEPS (this is what you asked for) -->
+    <div class="dir-steps" id="dirSteps"></div>
+
+  </div>
+</div>
+
+<div id="panoPreviewFloating" class="pano-preview-floating hidden">
+  <div class="pano-preview-box" onclick="openDeptPanorama()">
+    <img id="panoPreviewImg" src="" alt="Panorama Preview">
+    <div class="pano-preview-overlay">Explore 360°</div>
+  </div>
+</div>
+
+<div id="deptPanel" class="dept-panel">
+  <div class="panel-handle"></div>
+  
+  <h2 id="deptTitle">Select a department</h2>
+
+  <button id="directionsBtn" onclick="getDirectionsToDept(currentDept)">Get Directions ➤</button>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="openTab('overview')">Overview</button>
+    <!-- <button class="tab-btn" onclick="openTab('updates')">Updates</button> -->
+    <button class="tab-btn" onclick="openTab('about')">About</button>
+  </div>
+
+  <div class="tab-content" id="overview">
+    <p id="overviewText">Select a department to see details.</p>
+    <div id="overviewGallery" class="overview-gallery"></div>
+    <p id="overviewText"></p>
+
+  </div>
+
+  <div class="tab-content hidden" id="updates">
+    <button class="btnupdate" onclick="openTab('add photos')">Add Photos</button>
+    <p>Updates will appear here.</p>
+  </div>
+
+  <div class="tab-content hidden" id="about">
+    <div id="aboutText">Department information will appear here.</div>
+  </div>
+
+  
+</div>
+
+<div id="locPromptBackdrop" class="loc-backdrop hidden">
+  <div class="loc-modal">
+    <h3>Enable location?</h3>
+    <p>
+      PRMSU Wayfinder can show your live position to help with directions.
+      You can also skip this and enable it later.
+    </p>
+
+    <div class="loc-actions">
+      <button id="locDenyBtn" type="button" class="loc-btn secondary">Not now</button>
+      <button id="locAllowBtn" type="button" class="loc-btn primary">Allow</button>
+    </div>
+
+    <!--<label class="loc-remember">
+      <input id="locRememberChk" type="checkbox" />
+      Don’t ask again
+    </label>-->
+  </div>
+</div>
+
+<div id="offscreenArrow" class="offscreen-arrow hidden">
+  <div class="offscreen-arrow-inner"></div>
+</div>
+
+<!--<div id="debugGPS" style="
+  position: fixed;
+  bottom: 15px;
+  left: 15px;
+  background: rgba(0,0,0,0.85);
+  color: #00ff88;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-family: monospace;
+  border-radius: 6px;
+  z-index: 9999;
+  line-height: 1.4;
+">
+  Waiting for GPS...
+</div> -->
+<script src="/socket.io/socket.io.js"></script>
+<script src="graph.js"></script>
+<script src="script.js"></script>
+<script src="destination.js"></script>
+<script src="live.js"></script>
+  
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBf57IQH3q1FM4-cSEODyhgVyMNEGwzlQM&libraries=places&libraries=geometry&callback=initMap"
+  async
+  defer>
+</script>
+
+</body>
+</html>

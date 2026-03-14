@@ -1,0 +1,233 @@
+/* =========================
+   MOBILE SEARCH BEHAVIOR
+   ========================= */
+@media (max-width: 768px) {
+
+  .topbar{
+    height: 100px !important;
+    padding: 0 12px !important;
+    gap: 10px !important;
+    position: fixed !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    overflow: visible !important;
+  }
+
+  .topbar-left{
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    min-width: 0 !important;
+    flex: 0 1 auto !important;
+  }
+
+  .topbar .banner-logo{
+    height: 85px !important;
+    width: auto !important;
+    min-width: 40px !important;
+    flex: 0 0 auto !important;
+    transition: opacity 0.2s ease !important;
+  }
+
+  .topbar-title{
+    min-width: 0 !important;
+    transition: opacity 0.2s ease !important;
+  }
+
+  /* ===== MOBILE GM PILL BASE ===== */
+  .topbar .gm-pill{
+    position: absolute !important;
+    right: 12px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+
+    width: 48px !important;
+    min-width: 48px !important;
+    max-width: 48px !important;
+    height: 48px !important;
+
+    padding: 0 !important;
+    border-radius: 999px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-direction: row !important;
+    gap: 0 !important;
+
+    overflow: visible !important;
+    box-sizing: border-box !important;
+
+    background: #ffbd2a !important;
+    border: 1px solid rgba(255,255,255,0.14) !important;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.18) !important;
+
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+
+    z-index: 9999 !important;
+
+    transition:
+      width 0.35s ease,
+      min-width 0.35s ease,
+      max-width 0.35s ease,
+      border-radius 0.35s ease,
+      background 0.35s ease,
+      padding 0.35s ease,
+      transform 0.35s ease,
+      opacity 0.2s ease !important;
+  }
+
+  /* only the search button is visible while closed */
+  .topbar .gm-pill .search-icon{
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+
+    border: none !important;
+    border-radius: 999px !important;
+    background: transparent !important;
+    color: #fff !important;
+
+    font-size: 24px !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    z-index: 2 !important;
+    flex: 0 0 auto !important;
+  }
+
+  /* search content hidden by default */
+  .topbar .gm-pill .search-row{
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+
+    width: 0 !important;
+    min-width: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    overflow: hidden !important;
+
+    transition: opacity 0.18s ease !important;
+  }
+
+  .topbar .gm-pill input{
+    width: 100% !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+    color: #fff !important;
+    font-size: 14px !important;
+    box-sizing: border-box !important;
+  }
+
+  .topbar .gm-pill input::placeholder{
+    color: rgba(255,255,255,0.7) !important;
+  }
+
+  .topbar .gm-pill #clearSearch{
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    border-radius: 10px !important;
+    border: none !important;
+    background: rgba(255,255,255,0.10) !important;
+    color: #fff !important;
+    display: grid !important;
+    place-items: center !important;
+  }
+
+  /* ===== OPEN STATE ===== */
+  .topbar.expanded .gm-pill{
+    width: min(78vw, 340px) !important;
+    min-width: min(78vw, 340px) !important;
+    max-width: min(78vw, 340px) !important;
+
+    padding: 0 12px !important;
+    border-radius: 16px !important;
+
+    justify-content: flex-start !important;
+    background: rgba(255,255,255,0.10) !important;
+  }
+
+  .topbar.expanded .gm-pill .search-row{
+    width: 100% !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transition-delay: 0.12s !important;
+  }
+
+  /* keep the button visible as the anchor on the right */
+  .topbar.expanded .gm-pill .search-icon{
+    color: #fff !important;
+    background: transparent !important;
+  }
+
+  /* optional fade so logo area doesn't fight the pill */
+  .topbar.expanded .topbar-title{
+    opacity: 0 !important;
+  }
+
+  .topbar.expanded .banner-logo{
+    opacity: 0 !important;
+  }
+
+  /* dropdown */
+  #searchPanel{
+    max-height: 70vh !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  #searchPanel button{
+    padding: 14px 14px !important;
+    font-size: 12px !important;
+  }
+
+  /* the rest of your mobile fixes */
+  #map{
+    height: calc(100vh - 64px) !important;
+  }
+
+  .zoom-slider-container{
+    left: 360px !important;
+    right: 10px !important;
+    top: auto !important;
+    bottom: 300px !important;
+    transform: none !important;
+    gap: 50px !important;
+    padding: 8px !important;
+    z-index: 9999 !important;
+    pointer-events: auto !important;
+  }
+
+  #zoomSlider{
+    width: 140px !important;
+  }
+
+  button, .tab-btn, input{
+    min-height: 44px !important;
+    font-size: 15px !important;
+  }
+
+  #directionsBtn{
+    width: 100% !important;
+  }
+
+  .overview-gallery img{
+    width: 220px !important;
+    height: 200px !important;
+  }
+
+  .directions-panel{
+    width: 78vw !important;
+    max-width: 78vw !important;
+  }
+}
