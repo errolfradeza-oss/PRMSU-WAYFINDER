@@ -655,8 +655,9 @@ marker.addListener("click", () => {
   
 });
 
-  setupLocationPrePrompt();
   setupSearchPanel(map, locations);
+  setupLocationPrePrompt();
+  
 
 }
 
