@@ -984,6 +984,9 @@ function setupSearchPanel(map, locations) {
 
   const pill = input.closest(".gm-pill");
   const topbar = document.querySelector(".topbar");
+    /* FIX: keep taps inside search pill from bubbling to document/map */
+  pill?.addEventListener("click", (e) => e.stopPropagation());
+  pill?.addEventListener("touchstart", (e) => e.stopPropagation(), { passive: true });
 
   const key = (s) => (s || "").toLowerCase().replace(/[^a-z0-9]/g, "");
   let current = [];
@@ -1064,6 +1067,13 @@ function setupSearchPanel(map, locations) {
       return;
     }
 
+    //added
+    /* FIX: tapping the input on mobile should keep search open */
+  input.addEventListener("touchstart", (e) => {
+    e.stopPropagation();
+    if (isMobile()) topbar.classList.add("expanded");
+  }, { passive: true });
+
     const matches = locations.filter((l) => key(l.title).includes(q));
     render(matches);
   });
@@ -1094,19 +1104,26 @@ function setupSearchPanel(map, locations) {
     input.focus();
   });
 
-  toggleBtn?.addEventListener("click", (e) => {
-    e.stopPropagation();
+  /* FIX: use one shared handler for both click and touch on mobile */
+function handleSearchToggle(e) {
+  e.preventDefault();
+  e.stopPropagation();
 
-    if (isMobile()) {
-      if (topbar.classList.contains("expanded")) {
-        closePanel();
-      } else {
-        openMobileSearch();
-      }
+  if (isMobile()) {
+    if (topbar.classList.contains("expanded")) {
+      closePanel();
     } else {
-      input.focus();
+      openMobileSearch();
     }
-  });
+  } else {
+    input.focus();
+  }
+}
+
+toggleBtn?.addEventListener("click", handleSearchToggle);
+
+/* FIX: mobile sometimes needs touchstart instead of click */
+toggleBtn?.addEventListener("touchstart", handleSearchToggle, { passive: false });
 
   document.addEventListener("click", (e) => {
     if (!pill.contains(e.target)) {
