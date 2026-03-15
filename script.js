@@ -5,7 +5,7 @@ let campusBounds = null;
 let CAMPUS_GRAPH = new Map();// Graph for shortest path
 let markers = [];// for cleanup
 let currentDept = null;
-
+const HOVER_IMAGE_CACHE = new Map();
 
 const SNAP_DISTANCE = 6;// meters (connect nearby route points)
 const GATE_SNAP_MAX_METERS = 99999999; // snap to gate only if within this range (adjust)
@@ -449,6 +449,24 @@ if (dir) {
 
 let hoverInfoWindow;
 
+//pre load
+function preloadHoverImages() {
+  locations.forEach(loc => {
+    if (!loc.image) return;
+
+    const img = new Image();
+    img.src = loc.image;
+    img.loading = "eager";
+    img.decoding = "sync";
+
+    HOVER_IMAGE_CACHE.set(loc.title, img);
+
+    if (img.decode) {
+      img.decode().catch(() => {});
+    }
+  });
+}
+
 /* ===== Initialize Map ===== */
 function initMap() {
   campusBounds = new google.maps.LatLngBounds(
@@ -595,17 +613,8 @@ map.addListener("zoom_changed", () => {
   pixelOffset: new google.maps.Size(0, -10)
 });
 
-  //images
-  const hoverImageCache = new Map();
+preloadHoverImages();
 
-locations.forEach(loc => {
-  if (loc.image) {
-    const img = new Image();
-    img.src = loc.image;
-    img.decoding = "async";
-    hoverImageCache.set(loc.title, img);
-  }
-});
   // markers
   locations.forEach(loc => {
   const marker = new google.maps.Marker({
@@ -1258,6 +1267,8 @@ function revealMarkers() {
       }, 700);
     }, i * 30);
   });
+
+  preloadHoverImages();
 }
 
 function setupLocationPrePrompt() {
