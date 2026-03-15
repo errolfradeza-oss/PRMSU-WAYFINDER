@@ -1542,10 +1542,12 @@ function isTouchDevice() {
   );
 }
 
+//hovermarker
 function showMarkerHover(loc, marker) {
-  // clear previous hovered marker first
+  if (ACTIVE_HOVER_TITLE === loc.title) return;
+
   if (ACTIVE_HOVER_TITLE && ACTIVE_HOVER_TITLE !== loc.title) {
-    unglowBuilding(ACTIVE_HOVER_TITLE);
+    unglowBuilding(ACTIVE_HOVER_TITLE, true);
   }
 
   ACTIVE_HOVER_TITLE = loc.title;
@@ -1554,7 +1556,7 @@ function showMarkerHover(loc, marker) {
   if (loc.image) {
     hoverInfoWindow.setContent(`
       <div class="hover-card">
-        <img src="${loc.image}" alt="${loc.title}">
+        <img src="${loc.image}" alt="${loc.title}" width="220" height="140" decoding="async">
         <div class="hover-title">${loc.title}</div>
       </div>
     `);

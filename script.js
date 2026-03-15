@@ -596,12 +596,16 @@ map.addListener("zoom_changed", () => {
 });
 
   //images
-  locations.forEach(loc => {
-    if (loc.image) {
-      const img = new Image();
-      img.src = loc.image;
-    }
-  });
+  const hoverImageCache = new Map();
+
+locations.forEach(loc => {
+  if (loc.image) {
+    const img = new Image();
+    img.src = loc.image;
+    img.decoding = "async";
+    hoverImageCache.set(loc.title, img);
+  }
+});
   // markers
   locations.forEach(loc => {
   const marker = new google.maps.Marker({

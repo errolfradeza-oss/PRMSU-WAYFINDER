@@ -520,11 +520,21 @@ html, body{
   background: #181f63;
   box-shadow: 0 8px 20px rgba(0,0,0,0.35);
   font-family: system-ui, sans-serif;
+  opacity: 0;
+  transform: translateY(4px);
+  animation: hoverCardIn 140ms ease forwards;
+}
+
+@keyframes hoverCardIn{
+  to{
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .hover-card img{
-  width: 100%;
-  height: 120px;
+  width: 220px;
+  height: 140px;
   object-fit: cover;
   display: block;
 }
