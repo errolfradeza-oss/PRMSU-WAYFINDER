@@ -1252,19 +1252,23 @@ function setupLocationPrePrompt() {
 
   // already allowed this session
   if (sessionSaved === "allow") {
-    backdrop.classList.add("hidden");
-    revealMarkers();
+  backdrop.classList.add("hidden");
+  revealMarkers();
+
+  /* FIX: delay GPS startup until UI/search init is complete */
+  setTimeout(() => {
     getUserLocation();
     startMapGpsShare();
-    return;
-  }
+  }, 0);
 
-  // permanently denied
-  if (permanentSaved === "deny_permanent") {
-    backdrop.classList.add("hidden");
-    revealMarkers();
-    return;
-  }
+  return;
+}
+
+if (permanentSaved === "deny_permanent") {
+  backdrop.classList.add("hidden");
+  revealMarkers();
+  return;
+}
 
   // show prompt
   backdrop.classList.remove("hidden");
@@ -1276,11 +1280,15 @@ function setupLocationPrePrompt() {
 
   // IMPORTANT: overwrite old handlers cleanly
   allowBtn.onclick = () => {
-    sessionStorage.setItem("navfinder_loc_prompt", "allow");
-    closePrompt();
+  sessionStorage.setItem("navfinder_loc_prompt", "allow");
+  closePrompt();
+
+  /* FIX: delay GPS startup to avoid interfering with UI init */
+  setTimeout(() => {
     getUserLocation();
     startMapGpsShare();
-  };
+  }, 0);
+};
 
   denyBtn.onclick = () => {
     if (rememberChk?.checked) {
