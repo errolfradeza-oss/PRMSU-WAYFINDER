@@ -95,6 +95,9 @@ html, body{
 
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+
+  /* FIX: creates a cleaner stacking context for the dropdown */
+  isolation: isolate;
 }
 
 .topbar .gm-pill .search-row{
@@ -141,18 +144,20 @@ html, body{
    ========================= */
 #searchPanel{
   position: absolute;
-  top: 100%;
+  top: calc(100% + 6px);
   left: 0;
   width: 100%;
-  margin-top: 6px;
+  margin-top: 0;
 
   display: none;
-  z-index: 9999;
+  z-index: 10001;
 
   background: rgba(15, 20, 35, 0.95);
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+
+  pointer-events: auto;
 }
 
 #searchPanel.open{
@@ -478,10 +483,6 @@ html, body{
   line-height: 1.5;
 }
 
-.hidden{
-  display: none;
-}
-
 /* keep this later version (non-topbar usage) */
 .banner-logo{
   height: 150px;
@@ -590,8 +591,10 @@ html, body{
   z-index: 9999;
 }
 
+/* FIX: hidden backdrop must not block clicks */
 .loc-backdrop.hidden{
-  display: none;
+  display: none !important;
+  pointer-events: none !important;
 }
 
 .loc-modal{

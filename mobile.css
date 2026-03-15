@@ -77,6 +77,7 @@
       padding 0.35s ease,
       transform 0.35s ease,
       opacity 0.2s ease !important;
+      isolation: isolate;
   }
 
   /* only the search button is visible while closed */
@@ -164,6 +165,13 @@
     transition-delay: 0.12s !important;
   }
 
+    /* FIX: make sure every search control is tappable when expanded */
+  .topbar.expanded .gm-pill input,
+  .topbar.expanded .gm-pill #clearSearch,
+  .topbar.expanded .gm-pill .search-icon{
+    pointer-events: auto !important;
+  }
+
   /* keep the button visible as the anchor on the right */
   .topbar.expanded .gm-pill .search-icon{
     color: #fff !important;
@@ -180,10 +188,18 @@
   }
 
   /* dropdown */
+    /* dropdown */
   #searchPanel{
+    /* FIX: keep mobile dropdown scrollable */
     max-height: 70vh !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
+
+    /* FIX: keep dropdown above expanded pill/topbar layers */
+    z-index: 10001 !important;
+
+    /* FIX: allow taps inside results */
+    pointer-events: auto !important;
   }
 
   #searchPanel button{
