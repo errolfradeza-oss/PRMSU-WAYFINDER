@@ -1,59 +1,120 @@
 const express = require("express");
-const https = require("https");
-const fs = require("fs");
+const http = require("http");
 const path = require("path");
 const { Server } = require("socket.io");
 
-console.log("✅ server.js starting...");
-
 const app = express();
 
-app.use(express.static("public"));
+/* =========================
+   BASIC EXPRESS SETUP
+   ========================= */
+app.use(express.static(__dirname));
+
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "Wayfinder.html"));
+  res.sendFile(path.join(__dirname, "index.html"));
 });
-app.get("/ping", (req, res) => res.type("text").send("PONG OK"));
 
-const sslOptions = {
-  key: fs.readFileSync(path.join(__dirname, "sslcert", "key.pem")),
-  cert: fs.readFileSync(path.join(__dirname, "sslcert", "cert.pem")),
-};
+app.get("/ping", (req, res) => {
+  res.type("text").send("PONG OK");
+});
 
-const server = https.createServer(sslOptions, app);
+/* =========================
+   CREATE HTTP SERVER
+   Hosting platform will handle HTTPS for you
+   ========================= */
+const server = http.createServer(app);
 
+/* =========================
+   SOCKET.IO
+   Replace the GitHub Pages URL below with your real one
+   Example:
+   https://errolfradeza-oss.github.io
+   ========================= */
 const io = new Server(server, {
-  cors: { origin: "*" }
+  cors: {
+    origin: [
+      "https://errolfradeza-oss.github.io",
+      "http://localhost:5500",
+      "http://127.0.0.1:5500",
+      "http://localhost:3000",
+      "http://127.0.0.1:3000"
+    ],
+    methods: ["GET", "POST"]
+  }
 });
 
-// socket.id -> user
+/* =========================
+   PRESENCE STORAGE
+   socket.id -> user object
+   ========================= */
 const presence = new Map();
 
-function getActiveUsers() {
+const STALE_MS = 15000;
+
+/* =========================
+   HELPERS
+   ========================= */
+function normalizeNumber(value) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
+function normalizeBoolean(value) {
+  return value === true || value === "true" || value === 1 || value === "1";
+}
+
+function pruneStaleUsers() {
   const now = Date.now();
-  const STALE_MS = 15000;
 
   for (const [socketId, user] of presence.entries()) {
     if (!user || now - (user.lastSeen || 0) > STALE_MS) {
       presence.delete(socketId);
     }
   }
+}
 
-  return Array.from(presence.values()).filter(u =>
-    u.insideCampus === true &&
-    typeof u.lat === "number" &&
-    typeof u.lng === "number"
-  );
+function getActiveUsers() {
+  pruneStaleUsers();
+
+  return Array.from(presence.values()).filter((user) => {
+    return (
+      user.insideCampus === true &&
+      typeof user.lat === "number" &&
+      Number.isFinite(user.lat) &&
+      typeof user.lng === "number" &&
+      Number.isFinite(user.lng)
+    );
+  });
 }
 
 function emitPresence() {
   io.emit("presence:update", getActiveUsers());
 }
 
+function buildUserPayload(socket, user, prev = {}) {
+  const lat = normalizeNumber(user?.lat);
+  const lng = normalizeNumber(user?.lng);
+  const acc = normalizeNumber(user?.acc);
+
+  return {
+    id: String(user?.id || prev.id || socket.id),
+    name: String(user?.name || prev.name || "Guest").slice(0, 24),
+    lat,
+    lng,
+    acc,
+    insideCampus: normalizeBoolean(user?.insideCampus),
+    lastSeen: Date.now()
+  };
+}
+
+/* =========================
+   SOCKET EVENTS
+   ========================= */
 io.on("connection", (socket) => {
   console.log("✅ Socket connected:", socket.id);
 
   socket.on("presence:join", (user) => {
-    presence.set(socket.id, {
+    const joinedUser = {
       id: String(user?.id || socket.id),
       name: String(user?.name || "Guest").slice(0, 24),
       lat: null,
@@ -61,42 +122,48 @@ io.on("connection", (socket) => {
       acc: null,
       insideCampus: false,
       lastSeen: Date.now()
-    });
+    };
 
+    presence.set(socket.id, joinedUser);
+
+    console.log("👤 User joined:", joinedUser);
     emitPresence();
   });
 
   socket.on("presence:heartbeat", (user) => {
     const prev = presence.get(socket.id) || {};
 
-    presence.set(socket.id, {
-      ...prev,
-      id: String(user?.id || prev.id || socket.id),
-      name: String(user?.name || prev.name || "Guest").slice(0, 24),
-      lat: Number(user?.lat),
-      lng: Number(user?.lng),
-      acc: user?.acc ?? null,
-      insideCampus: Boolean(user?.insideCampus),
-      lastSeen: Date.now()
-    });
+    const updatedUser = buildUserPayload(socket, user, prev);
+    presence.set(socket.id, updatedUser);
 
     emitPresence();
   });
 
-  socket.on("disconnect", () => {
-    console.log("❌ Socket disconnected:", socket.id);
+  socket.on("presence:leave", () => {
+    console.log("👋 User left:", socket.id);
+    presence.delete(socket.id);
+    emitPresence();
+  });
+
+  socket.on("disconnect", (reason) => {
+    console.log("❌ Socket disconnected:", socket.id, "| reason:", reason);
     presence.delete(socket.id);
     emitPresence();
   });
 });
 
+/* =========================
+   PERIODIC CLEANUP + BROADCAST
+   ========================= */
 setInterval(() => {
   emitPresence();
 }, 5000);
 
+/* =========================
+   START SERVER
+   ========================= */
 const PORT = process.env.PORT || 3000;
+
 server.listen(PORT, "0.0.0.0", () => {
-  console.log(`✅ HTTPS Server running:
-  - https://localhost:${PORT}
-  - https://<your-laptop-ip>:${PORT}`);
+  console.log(`✅ Server running on port ${PORT}`);
 });
