@@ -713,7 +713,7 @@ function getUserLocation() {
       zIndex: 1
     });
 } else {
-//window.userGlow.setCenter(userLocation);
+window.userGlow.setCenter(userLocation);
 }
 
       const debug = document.getElementById("debugGPS");
@@ -1400,7 +1400,9 @@ const ME_NAME =
 
 sessionStorage.setItem("wayfinder_user_name", ME_NAME);
 
-const liveUserMarkers = new Map(); // other users only
+// store other users as: { marker, glow }
+const liveUserMarkers = new Map();
+
 let gpsShareStarted = false;
 let lastPresenceSentAt = 0;
 const PRESENCE_SEND_MS = 1000;
@@ -1410,22 +1412,43 @@ function isInsideCampus(pos) {
   return campusBounds.contains(new google.maps.LatLng(pos.lat, pos.lng));
 }
 
+// =========================
+// OTHER USERS MARKER + GLOW
+// =========================
 function upsertLiveUserMarker(u) {
   const mapRef = window.map || map;
   if (!mapRef) return;
   if (!u || typeof u.lat !== "number" || typeof u.lng !== "number") return;
   if (u.id === ME_ID) return;
 
-  let marker = liveUserMarkers.get(u.id);
+  const pos = { lat: u.lat, lng: u.lng };
+  let entry = liveUserMarkers.get(u.id);
 
-  if (!marker) {
-    marker = new google.maps.Marker({
+  if (!entry) {
+    // glow behind marker
+    const glow = new google.maps.Circle({
       map: mapRef,
-      position: { lat: u.lat, lng: u.lng },
+      center: pos,
+      radius: 10, // meters
+      strokeOpacity: 0,
+      fillColor: "#ff3b30",
+      fillOpacity: 0.22,
+      zIndex: 1
+    });
+
+    // actual user dot
+    const marker = new google.maps.Marker({
+      map: mapRef,
+      position: pos,
       title: u.name || "Active User",
+      zIndex: 2,
       icon: {
-        url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
-        scaledSize: new google.maps.Size(40, 40)
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 8,
+        fillColor: "#ff3b30",
+        fillOpacity: 1,
+        strokeColor: "#ffffff",
+        strokeWeight: 2
       },
       label: {
         text: (u.name || "User").slice(0, 10),
@@ -1433,18 +1456,21 @@ function upsertLiveUserMarker(u) {
       }
     });
 
-    liveUserMarkers.set(u.id, marker);
+    entry = { marker, glow };
+    liveUserMarkers.set(u.id, entry);
   } else {
-    marker.setPosition({ lat: u.lat, lng: u.lng });
+    entry.marker.setPosition(pos);
+    entry.glow.setCenter(pos);
   }
 }
 
 function removeMissingLiveMarkers(users) {
   const activeIds = new Set((users || []).map(u => u.id));
 
-  for (const [id, marker] of liveUserMarkers.entries()) {
+  for (const [id, entry] of liveUserMarkers.entries()) {
     if (!activeIds.has(id)) {
-      marker.setMap(null);
+      if (entry.marker) entry.marker.setMap(null);
+      if (entry.glow) entry.glow.setMap(null);
       liveUserMarkers.delete(id);
     }
   }
