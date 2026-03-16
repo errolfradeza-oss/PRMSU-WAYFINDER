@@ -5,9 +5,6 @@ const { Server } = require("socket.io");
 
 const app = express();
 
-/* =========================
-   BASIC EXPRESS SETUP
-   ========================= */
 app.use(express.static(__dirname));
 
 app.get("/", (req, res) => {
@@ -18,18 +15,8 @@ app.get("/ping", (req, res) => {
   res.type("text").send("PONG OK");
 });
 
-/* =========================
-   CREATE HTTP SERVER
-   Hosting platform will handle HTTPS for you
-   ========================= */
 const server = http.createServer(app);
 
-/* =========================
-   SOCKET.IO
-   Replace the GitHub Pages URL below with your real one
-   Example:
-   https://errolfradeza-oss.github.io
-   ========================= */
 const io = new Server(server, {
   cors: {
     origin: [
@@ -43,17 +30,9 @@ const io = new Server(server, {
   }
 });
 
-/* =========================
-   PRESENCE STORAGE
-   socket.id -> user object
-   ========================= */
 const presence = new Map();
-
 const STALE_MS = 15000;
 
-/* =========================
-   HELPERS
-   ========================= */
 function normalizeNumber(value) {
   const n = Number(value);
   return Number.isFinite(n) ? n : null;
@@ -76,9 +55,9 @@ function pruneStaleUsers() {
 function getActiveUsers() {
   pruneStaleUsers();
 
+  // TEMP TEST: removed insideCampus filter for easier debugging
   return Array.from(presence.values()).filter((user) => {
     return (
-      user.insideCampus === true &&
       typeof user.lat === "number" &&
       Number.isFinite(user.lat) &&
       typeof user.lng === "number" &&
@@ -88,7 +67,9 @@ function getActiveUsers() {
 }
 
 function emitPresence() {
-  io.emit("presence:update", getActiveUsers());
+  const users = getActiveUsers();
+  console.log("📡 Broadcasting presence:update:", users);
+  io.emit("presence:update", users);
 }
 
 function buildUserPayload(socket, user, prev = {}) {
@@ -107,9 +88,6 @@ function buildUserPayload(socket, user, prev = {}) {
   };
 }
 
-/* =========================
-   SOCKET EVENTS
-   ========================= */
 io.on("connection", (socket) => {
   console.log("✅ Socket connected:", socket.id);
 
@@ -125,17 +103,17 @@ io.on("connection", (socket) => {
     };
 
     presence.set(socket.id, joinedUser);
-
     console.log("👤 User joined:", joinedUser);
     emitPresence();
   });
 
   socket.on("presence:heartbeat", (user) => {
     const prev = presence.get(socket.id) || {};
-
     const updatedUser = buildUserPayload(socket, user, prev);
+
     presence.set(socket.id, updatedUser);
 
+    console.log("💓 Heartbeat received:", updatedUser);
     emitPresence();
   });
 
@@ -152,16 +130,10 @@ io.on("connection", (socket) => {
   });
 });
 
-/* =========================
-   PERIODIC CLEANUP + BROADCAST
-   ========================= */
 setInterval(() => {
   emitPresence();
 }, 5000);
 
-/* =========================
-   START SERVER
-   ========================= */
 const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, "0.0.0.0", () => {
