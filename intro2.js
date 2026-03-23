@@ -54,28 +54,25 @@ function next(n) {
   const nextScreen = document.getElementById("s" + (n + 1));
 
   if (n === 1) {
-    if (!current || !nextScreen) return;
+  if (!current || !nextScreen) return;
 
-    locked = true;
+  locked = true;
 
-    const logo = document.querySelector(".logo-center");
-    if (logo) logo.style.display = "none";
+  current.classList.add("zooming");
 
-    current.classList.add("zooming");
+  setTimeout(() => {
+    current.classList.remove("active");
+    current.classList.remove("zooming");
+    nextScreen.classList.add("active");
 
-    setTimeout(() => {
-      current.classList.remove("active");
-      current.classList.remove("zooming");
-      nextScreen.classList.add("active");
+    currentScreen = 2;
+    screen2Shown = false;
 
-      currentScreen = 2;
-      screen2Shown = false;
+    runScreenReveals(2);
+  }, 3500);
 
-      runScreenReveals(2);
-    }, 1800);
-
-    return;
-  }
+  return;
+}
 
   if (n === 3) {
     goLogin();

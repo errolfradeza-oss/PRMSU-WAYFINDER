@@ -1386,7 +1386,9 @@ function openDeptPanorama() {
 
 // ===================== SHARED LIVE USER MAP =====================
 
-const socket = io("https://prmsu-wayfinder.onrender.com");
+const socket = io("https://prmsu-wayfinder.onrender.com", {
+  transports: ["websocket", "polling"]
+});
 
 const ME_ID =
   sessionStorage.getItem("wayfinder_user_id") ||

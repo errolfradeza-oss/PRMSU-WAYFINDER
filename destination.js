@@ -10,7 +10,7 @@ function formatDistance(meters) {
 
 function setCurrentLocationName(name) {
   const from = document.getElementById("fromInput");
-  from.value = name;        // now it's real
+  from.value = name;  
 }
 
 function setDestination(deptName) {
