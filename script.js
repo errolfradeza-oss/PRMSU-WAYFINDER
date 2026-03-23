@@ -1421,7 +1421,7 @@ function upsertLiveUserMarker(u) {
   const mapRef = window.map || map;
   if (!mapRef) return;
   if (!u || typeof u.lat !== "number" || typeof u.lng !== "number") return;
-  if (u.id === ME_ID) return;
+  //if (u.id === ME_ID) return;
 
   const pos = { lat: u.lat, lng: u.lng };
   let entry = liveUserMarkers.get(u.id);
@@ -1490,7 +1490,7 @@ socket.on("presence:update", (users) => {
 
   for (const u of users || []) {
     if (!u) continue;
-    if (u.id === ME_ID) continue;
+    //if (u.id === ME_ID) continue;
     upsertLiveUserMarker(u);
   }
 });
