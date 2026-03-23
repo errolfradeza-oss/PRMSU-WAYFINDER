@@ -503,21 +503,19 @@ function initMap() {
   window.map = map;
 
   map.fitBounds(campusBounds);
-try {
   drawCampusPaths();
   buildCampusGraph();
+
   initOffscreenArrow();
   initBuildingPolygons();
 
-  google.maps.event.addListenerOnce(map, "idle", () => {
-    initProjectionHelper();
+google.maps.event.addListenerOnce(map, "idle", () => {
+  initProjectionHelper();
 
   // run once after projection becomes available
-    updateOffscreenArrow();
-  });
-  } catch (err) {
-  console.error("Map build section failed:", err);
-}
+  updateOffscreenArrow();
+});
+
 // Fit the campus bounds (this sets the correct "max zoom-out")
 map.fitBounds(campusBounds);
 map.setTilt(45);
