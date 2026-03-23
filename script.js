@@ -471,7 +471,7 @@ function preloadHoverImages() {
 function initMap() {
   campusBounds = new google.maps.LatLngBounds(
     { lat: 15.3163, lng: 119.9812 },
-    { lat: 15.3225, lng: 119.9859 }
+    { lat: 15.3242, lng: 119.9859 }
   );
   const DESIRED_MAX_ZOOM = 20;
 
@@ -753,7 +753,7 @@ Lng: ${userLocation.lng.toFixed(6)}`;
       // ✅ Only focus once (first good fix)
       if (!hasAutoCentered) {
         map.setCenter(userLocation);
-        map.setZoom(17);
+        map.setZoom(15);
         hasAutoCentered = true;
       }
 
