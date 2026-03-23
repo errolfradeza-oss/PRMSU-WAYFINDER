@@ -473,6 +473,7 @@ function initMap() {
     { lat: 15.3163, lng: 119.9812 },
     { lat: 15.3225, lng: 119.9859 }
   );
+
   const DESIRED_MAX_ZOOM = 20;
 
   map = new google.maps.Map(document.getElementById("map"), {
@@ -485,193 +486,158 @@ function initMap() {
     restriction: { latLngBounds: campusBounds, strictBounds: true },
     styles: [{ featureType: "poi", stylers: [{ visibility: "off" }] }],
     mapTypeControl: false,
-    streetViewControl: false,
-    mapTypeControlOptions: {
-      style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
-      position: google.maps.ControlPosition.TOP_RIGHT,
-      mapTypeIds: ["roadmap", "satellite", "terrain"]
-    }
+    streetViewControl: false
   });
 
-  map.addListener("click", () => {
-  if (isTouchDevice()) {
-    hideMarkerHover();
-  }
-});
-
-  //newww
   window.map = map;
 
+  map.addListener("click", () => {
+    if (isTouchDevice()) hideMarkerHover();
+  });
+
   map.fitBounds(campusBounds);
-  drawCampusPaths();
-  buildCampusGraph();
+  map.setTilt(45);
 
-  initOffscreenArrow();
-  initBuildingPolygons();
+  // Keep route/build errors from killing the whole page
+  try {
+    drawCampusPaths();
+    buildCampusGraph();
+    initOffscreenArrow();
+    initBuildingPolygons();
 
-google.maps.event.addListenerOnce(map, "idle", () => {
-  initProjectionHelper();
+    google.maps.event.addListenerOnce(map, "idle", () => {
+      initProjectionHelper();
+      updateOffscreenArrow();
+    });
+  } catch (err) {
+    console.error("Route/build init failed:", err);
+  }
 
-  // run once after projection becomes available
-  updateOffscreenArrow();
-});
+  // Zoom slider
+  const zoomSlider = document.getElementById("zoomSlider");
+  if (zoomSlider) {
+    zoomSlider.min = 0;
+    zoomSlider.max = 100;
+    zoomSlider.step = 0.1;
+  }
 
-// Fit the campus bounds (this sets the correct "max zoom-out")
-map.fitBounds(campusBounds);
-map.setTilt(45);
+  let MIN_ZOOM;
+  const MAX_ZOOM = DESIRED_MAX_ZOOM;
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 
-//zoom slider setup
-const zoomSlider = document.getElementById("zoomSlider");
+  function zoomToPct(z) {
+    return ((z - MIN_ZOOM) / (MAX_ZOOM - MIN_ZOOM)) * 100;
+  }
 
-// Slider is PERCENT, not zoom
-zoomSlider.min = 0;
-zoomSlider.max = 100;
-zoomSlider.step = 0.1;
+  function pctToZoom(p) {
+    return MIN_ZOOM + (p / 100) * (MAX_ZOOM - MIN_ZOOM);
+  }
 
-let MIN_ZOOM;                 // will be computed from fitBounds
-const MAX_ZOOM = DESIRED_MAX_ZOOM;
+  let animToken = 0;
+  function animateSliderTo(targetPct, ms = 160) {
+    if (!zoomSlider) return;
+    const start = Number(zoomSlider.value) || 0;
+    const end = clamp(targetPct, 0, 100);
+    const t0 = performance.now();
+    const myToken = ++animToken;
 
-// --- helper ---
-const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+    const tick = (t) => {
+      if (myToken !== animToken) return;
+      const k = clamp((t - t0) / ms, 0, 1);
+      const eased = 1 - Math.pow(1 - k, 3);
+      zoomSlider.value = start + (end - start) * eased;
+      if (k < 1) requestAnimationFrame(tick);
+    };
 
-function zoomToPct(z) {
-  return ((z - MIN_ZOOM) / (MAX_ZOOM - MIN_ZOOM)) * 100;
-}
+    requestAnimationFrame(tick);
+  }
 
-function pctToZoom(p) {
-  return MIN_ZOOM + (p / 100) * (MAX_ZOOM - MIN_ZOOM);
-}
+  google.maps.event.addListenerOnce(map, "idle", () => {
+    MIN_ZOOM = map.getZoom();
+    map.setOptions({ minZoom: MIN_ZOOM, maxZoom: MAX_ZOOM });
 
-// Smoothly animate native thumb to target pct (so yellow circle moves smoothly)
-let animToken = 0;
-function animateSliderTo(targetPct, ms = 160) {
-  const start = Number(zoomSlider.value) || 0;
-  const end = clamp(targetPct, 0, 100);
-  const t0 = performance.now();
-  const myToken = ++animToken;
+    if (zoomSlider) {
+      zoomSlider.value = clamp(zoomToPct(map.getZoom()), 0, 100);
+    }
+  });
 
-  const tick = (t) => {
-    if (myToken !== animToken) return; // cancel previous animation
-    const k = clamp((t - t0) / ms, 0, 1);
-    const eased = 1 - Math.pow(1 - k, 3); // ease-out
+  if (zoomSlider) {
+    zoomSlider.addEventListener("input", () => {
+      if (MIN_ZOOM == null) return;
+      map.setZoom(pctToZoom(Number(zoomSlider.value)));
+    });
 
-    const v = start + (end - start) * eased;
-    zoomSlider.value = v;
+    let dragging = false;
+    zoomSlider.addEventListener("mousedown", () => dragging = true);
+    zoomSlider.addEventListener("touchstart", () => dragging = true, { passive: true });
+    window.addEventListener("mouseup", () => dragging = false);
+    window.addEventListener("touchend", () => dragging = false, { passive: true });
 
-    if (k < 1) requestAnimationFrame(tick);
-  };
-
-  requestAnimationFrame(tick);
-}
-
-// After fitBounds finishes, lock that zoom as the MIN_ZOOM (your max zoom-out)
-google.maps.event.addListenerOnce(map, "idle", () => {
-  MIN_ZOOM = map.getZoom(); // ✅ campus-wide zoom out
-
-  // lock map zoom limits
-  map.setOptions({ minZoom: MIN_ZOOM, maxZoom: MAX_ZOOM });
-  //map.setTilt(45); // optional, comment out if you hate tilt
-  // init slider position from current zoom
-  const pct = zoomToPct(map.getZoom());
-  zoomSlider.value = clamp(pct, 0, 100);
-});
-
-// Slider -> Map (dragging)
-zoomSlider.addEventListener("input", () => {
-  if (MIN_ZOOM == null) return;
-
-  const pct = Number(zoomSlider.value);
-  const desiredZoom = pctToZoom(pct);
-
-  // map zoom is integer, so round
-  map.setZoom(desiredZoom);
-
-});
-
-let dragging = false;
-
-zoomSlider.addEventListener("mousedown", () => dragging = true);
-zoomSlider.addEventListener("touchstart", () => dragging = true, { passive: true });
-
-window.addEventListener("mouseup", () => dragging = false);
-window.addEventListener("touchend", () => dragging = false, { passive: true });
-
-
-// Map -> Slider (wheel/pinch)
-map.addListener("zoom_changed", () => {
-  if (MIN_ZOOM == null) return;
-  if (dragging) return;
-
-  const z = clamp(map.getZoom(), MIN_ZOOM, MAX_ZOOM);
-  animateSliderTo(zoomToPct(z), 160);
-});
-
-
+    map.addListener("zoom_changed", () => {
+      if (MIN_ZOOM == null || dragging) return;
+      const z = clamp(map.getZoom(), MIN_ZOOM, MAX_ZOOM);
+      animateSliderTo(zoomToPct(z), 160);
+    });
+  }
 
   hoverInfoWindow = new google.maps.InfoWindow({
-  disableAutoPan: true,
-  pixelOffset: new google.maps.Size(0, -10)
-});
-
-preloadHoverImages();
-
-  // markers
-  locations.forEach(loc => {
-  const marker = new google.maps.Marker({
-    position: loc.position,
-    map: null,
-    title: loc.title,
-    icon: {
-          url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-          scaledSize: new google.maps.Size(46, 46), // adjust
-          anchor: new google.maps.Point(18, 36),     // bottom-center
-          labelOrigin: new google.maps.Point(46, 55) // top-center for label
-          },
-    label: {
-    text: loc.title,
-    className: "marker-label",
-    //color: "#e3e3e3",
-    //fontSize: "12px",
-    //fontWeight: "600",
-    //fontFamily: "system-ui"
-    }
-
+    disableAutoPan: true,
+    pixelOffset: new google.maps.Size(0, -10)
   });
-  markers.push(marker);
 
-  // desktop hover
-marker.addListener("mouseover", () => {
-  showMarkerHover(loc, marker);
-});
+  try {
+    preloadHoverImages();
 
-marker.addListener("mouseout", () => {
-  if (!isTouchDevice()) {
-    hideMarkerHover();
+    markers.length = 0;
+
+    locations.forEach((loc) => {
+      const marker = new google.maps.Marker({
+        position: loc.position,
+        map: null,
+        title: loc.title,
+        icon: {
+          url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+          scaledSize: new google.maps.Size(46, 46),
+          anchor: new google.maps.Point(18, 36),
+          labelOrigin: new google.maps.Point(46, 55)
+        },
+        label: {
+          text: loc.title,
+          className: "marker-label"
+        }
+      });
+
+      markers.push(marker);
+
+      marker.addListener("mouseover", () => {
+        showMarkerHover(loc, marker);
+      });
+
+      marker.addListener("mouseout", () => {
+        if (!isTouchDevice()) hideMarkerHover();
+      });
+
+      marker.addListener("click", () => {
+        if (isTouchDevice()) {
+          if (ACTIVE_HOVER_TITLE !== loc.title) {
+            showMarkerHover(loc, marker);
+            return;
+          }
+        }
+
+        closeSideMenu();
+        closeDirectionPanel();
+        openDeptPanel(loc);
+      });
+
+      loc.marker = marker;
+    });
+  } catch (err) {
+    console.error("Marker init failed:", err);
   }
-});
-
-// mobile + desktop tap/click
-marker.addListener("click", () => {
-  // on touch devices: first tap = hover, second tap = open panel
-  if (isTouchDevice()) {
-    if (ACTIVE_HOVER_TITLE !== loc.title) {
-      showMarkerHover(loc, marker);
-      return;
-    }
-  }
-
-  closeSideMenu();
-  closeDirectionPanel();
-  openDeptPanel(loc);
-});
-  loc.marker = marker;
-  
-});
 
   setupSearchPanel(map, locations);
   setupLocationPrePrompt();
-  
-
 }
 
 /* ===== Draw Campus Paths ===== */
