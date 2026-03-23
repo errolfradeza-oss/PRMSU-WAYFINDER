@@ -20,7 +20,6 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: [
-      "https://prmsuwayfinder.prmsuse101.com",
       "https://errolfradeza-oss.github.io",
       "http://localhost:5500",
       "http://127.0.0.1:5500",
