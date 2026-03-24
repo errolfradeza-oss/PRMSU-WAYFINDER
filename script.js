@@ -1282,25 +1282,23 @@ function setupLocationPrePrompt() {
   const sessionSaved = sessionStorage.getItem("navfinder_loc_prompt");
   const permanentSaved = localStorage.getItem("navfinder_loc_prompt");
 
-  // already allowed this session
-  if (sessionSaved === "allow") {
-  backdrop.classList.add("hidden");
-  revealMarkers();
+  if (sessionSaved === "allow" || permanentSaved === "allow") {
+    backdrop.classList.add("hidden");
+    revealMarkers();
 
-  /* FIX: delay GPS startup until UI/search init is complete */
-  setTimeout(() => {
-    getUserLocation();
-    startMapGpsShare();
-  }, 0);
+    setTimeout(() => {
+      getUserLocation();
+      startMapGpsShare();
+    }, 0);
 
-  return;
-}
+    return;
+  }
 
-if (permanentSaved === "deny_permanent") {
-  backdrop.classList.add("hidden");
-  revealMarkers();
-  return;
-}
+  if (permanentSaved === "deny_permanent") {
+    backdrop.classList.add("hidden");
+    revealMarkers();
+    return;
+  }
 
   // show prompt
   backdrop.classList.remove("hidden");
@@ -1313,9 +1311,9 @@ if (permanentSaved === "deny_permanent") {
   // IMPORTANT: overwrite old handlers cleanly
   allowBtn.onclick = () => {
   sessionStorage.setItem("navfinder_loc_prompt", "allow");
+  localStorage.setItem("navfinder_loc_prompt", "allow");
   closePrompt();
 
-  /* FIX: delay GPS startup to avoid interfering with UI init */
   setTimeout(() => {
     getUserLocation();
     startMapGpsShare();
