@@ -471,7 +471,7 @@ function preloadHoverImages() {
 function initMap() {
   campusBounds = new google.maps.LatLngBounds(
     { lat: 15.3163, lng: 119.9812 },
-    { lat: 15.3242, lng: 119.9859 }
+    { lat: 15.3235, lng: 119.9859 }
   );
   const DESIRED_MAX_ZOOM = 20;
 
