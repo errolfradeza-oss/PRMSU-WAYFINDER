@@ -1300,6 +1300,8 @@ function setupLocationPrePrompt() {
     return;
   }
 
+backdrop.classList.remove("hidden");
+
   // show prompt
   backdrop.classList.remove("hidden");
 
