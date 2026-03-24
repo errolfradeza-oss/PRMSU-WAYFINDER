@@ -1282,7 +1282,7 @@ function setupLocationPrePrompt() {
   const sessionSaved = sessionStorage.getItem("navfinder_loc_prompt");
   const permanentSaved = localStorage.getItem("navfinder_loc_prompt");
 
-  if (sessionSaved === "allow" || permanentSaved === "allow") {
+  if (sessionSaved === "allow") {
     backdrop.classList.add("hidden");
     revealMarkers();
 
@@ -1300,8 +1300,6 @@ function setupLocationPrePrompt() {
     return;
   }
 
-backdrop.classList.remove("hidden");
-
   // show prompt
   backdrop.classList.remove("hidden");
 
@@ -1313,7 +1311,7 @@ backdrop.classList.remove("hidden");
   // IMPORTANT: overwrite old handlers cleanly
   allowBtn.onclick = () => {
   sessionStorage.setItem("navfinder_loc_prompt", "allow");
-  localStorage.setItem("navfinder_loc_prompt", "allow");
+  localStorage.removeItem("navfinder_loc_prompt");
   closePrompt();
 
   setTimeout(() => {
