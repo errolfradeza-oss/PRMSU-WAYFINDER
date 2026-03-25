@@ -372,7 +372,7 @@ function drawCampusRoute(path) {
   map.fitBounds(bounds);
 }
 
-
+//changed for smart reroute
 /* ===== Directions: GATE-only snap origin ===== */
 function getDirectionsToDept(dept) { 
   if (!userLocation) {
@@ -421,6 +421,11 @@ function getDirectionsToDept(dept) {
   }
 
   const path = shortestPath(CAMPUS_GRAPH, coordKey(startPt), coordKey(endPt));
+  if (!path || path.length < 2) {
+    console.error("No valid route found");
+    return;
+  }
+
   drawCampusRoute(path);
 
   closeDeptPanel();
@@ -434,17 +439,14 @@ function getDirectionsToDept(dept) {
   renderDirectionsSteps(steps);
 
   const dir = document.getElementById("dirPanel");
-if (dir) {
-  dir.classList.add("open");
-  document.body.classList.add("dir-open");
-  document.body.classList.remove("dir-closing");
-}
+  if (dir) {
+    dir.classList.add("open");
+    document.body.classList.add("dir-open");
+    document.body.classList.remove("dir-closing");
+  }
 
-  NAV_ACTIVE = true;
-  NAV_DEST = dept; // or dept.position if you prefer
-
+  //for smart reroute
   startLiveNavigation(dept);
-
 }
 
 let hoverInfoWindow;
@@ -674,6 +676,7 @@ marker.addListener("click", () => {
 
 }
 
+//fixed for smart reroute
 /* ===== Draw Campus Paths ===== */
 function drawCampusPaths() {
   // draw each route (ADDITIONAL_ROUTES is array of arrays)
@@ -692,54 +695,59 @@ function drawCampusPaths() {
 let hasAutoCentered = false;
 
 function getUserLocation() {
-  if (!navigator.geolocation) return alert("Geolocation not supported");
+  if (!navigator.geolocation) {
+    alert("Geolocation not supported");
+    return;
+  }
 
   navigator.geolocation.watchPosition(
     (pos) => {
-      userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      userLocation = {
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude
+      };
 
       updateOffscreenArrow();
 
-      // Create glow circle once
-  if (!window.userGlow) {
-    window.userGlow = new google.maps.Circle({
-      map: map,
-      center: userLocation,
-      radius: 10, // meters
-      strokeColor: "#1e90ff",
-      strokeOpacity: 0,
-      fillColor: "#1e90ff",
-      fillOpacity: 0.25,
-      zIndex: 1
-    });
-} else {
-window.userGlow.setCenter(userLocation);
-}
+      // Create glow circle once, then update center
+      if (!window.userGlow) {
+        window.userGlow = new google.maps.Circle({
+          map: map,
+          center: userLocation,
+          radius: 10, // meters
+          strokeColor: "#1e90ff",
+          strokeOpacity: 0,
+          fillColor: "#1e90ff",
+          fillOpacity: 0.25,
+          zIndex: 1
+        });
+      } else {
+        window.userGlow.setCenter(userLocation);
+      }
 
+      // Optional GPS debug text
       const debug = document.getElementById("debugGPS");
-if (debug) {
-  debug.textContent =
-    `Lat: ${userLocation.lat.toFixed(6)}
-Lng: ${userLocation.lng.toFixed(6)}`;
-}
+      if (debug) {
+        debug.textContent =
+          `Lat: ${userLocation.lat.toFixed(6)}\nLng: ${userLocation.lng.toFixed(6)}`;
+      }
 
-
-      // startpos
+      // Show current location in FROM input
       const fromInput = document.getElementById("fromInput");
       if (fromInput) {
         fromInput.value = "Current location";
-        fromInput.readOnly = true; // optional (Google-style lock)
+        fromInput.readOnly = true;
       }
 
-      // Create once, then update
+      // Create marker once, then update
       if (!window.userMarker) {
         window.userMarker = new google.maps.Marker({
           position: userLocation,
           map: map,
           title: "You are here",
           icon: {
-             path: google.maps.SymbolPath.CIRCLE,
-            scale: 8, // inner dot size
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 8,
             fillColor: "#1e90ff",
             fillOpacity: 1,
             strokeColor: "#ffffff",
@@ -750,16 +758,17 @@ Lng: ${userLocation.lng.toFixed(6)}`;
         window.userMarker.setPosition(userLocation);
       }
 
-      // ✅ Only focus once (first good fix)
+      // Auto-center only once
       if (!hasAutoCentered) {
         map.setCenter(userLocation);
-        map.setZoom(16);
+        map.setZoom(17);
         hasAutoCentered = true;
       }
 
+      //for smart reroute
       liveRerouteIfNeeded();
-      updateStepsLive(userLocation);
 
+      updateStepsLive(userLocation);
     },
     (err) => {
       console.warn("Geolocation error:", err.message);
@@ -773,6 +782,7 @@ Lng: ${userLocation.lng.toFixed(6)}`;
   );
 }
 
+//old
 function getUserLocationPrompt() {
   setupLocationPrePrompt();
 }
@@ -1335,14 +1345,11 @@ function openLocationPrompt() {
   backdrop.classList.remove("hidden");
 }
 
+//for smart reroute
 //clear route function
 function clearRoute() {
-  // ✅ stop “live navigation” first so it won’t redraw on next GPS tick
-  NAV_ACTIVE = false;
-  NAV_DEST = null;
-
-  // if you have your own live timers/intervals, stop them here too
-  // e.g. if (window.liveNavTimer) { clearInterval(window.liveNavTimer); window.liveNavTimer=null; }
+  //for smart reroute
+  stopLiveNavigation();
 
   // Remove route line(s)
   if (activeRoute) {
@@ -1360,15 +1367,12 @@ function clearRoute() {
     dashAnimTimer = null;
   }
 
-  // Clear directions 
   // Clear directions UI
   const dirSteps = document.getElementById("dirSteps");
   if (dirSteps) dirSteps.innerHTML = "";
 
   // Clear inputs
-  //const fromInput = document.getElementById("fromInput");
   const toInput = document.getElementById("toInput");
-  //if (fromInput) fromInput.value = "";
   if (toInput) toInput.value = "";
 
   console.log("✅ Route cleared (nav stopped)");

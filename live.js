@@ -1,29 +1,31 @@
 /* ===== LIVE NAV (reroute while walking) ===== */
 let NAV_ACTIVE = false;
-let NAV_DEST = null; // store dept or position
+let NAV_DEST = null; // store dept object
 
 let lastRerouteTime = 0;
 let lastReroutePos = null;
 
-const REROUTE_MIN_MS = 1200;      // don't reroute too often
-const REROUTE_MIN_METERS = 7;     // reroute only if moved enough
-const OFF_ROUTE_METERS = 18;      // reroute faster if you're off the line
+const REROUTE_MIN_MS = 1200;   // don't reroute too often
+const REROUTE_MIN_METERS = 7;  // reroute only if user moved enough
+const OFF_ROUTE_METERS = 18;   // reroute faster if user is off the line
 
+//for smart reroute
 function startLiveNavigation(dept) {
   NAV_ACTIVE = true;
-  NAV_TARGET_DEPT = dept;
+  NAV_DEST = dept;
   lastRerouteTime = 0;
   lastReroutePos = null;
 }
 
+//for smart reroute
 function stopLiveNavigation() {
   NAV_ACTIVE = false;
-  NAV_TARGET_DEPT = null;
+  NAV_DEST = null;
   lastRerouteTime = 0;
   lastReroutePos = null;
 }
 
-// distance from point to segment (meters)
+//for smart reroute
 function distancePointToSegmentMeters(p, a, b) {
   const pLL = new google.maps.LatLng(p.lat, p.lng);
   const aLL = new google.maps.LatLng(a.lat, a.lng);
@@ -48,8 +50,10 @@ function distancePointToSegmentMeters(p, a, b) {
   return google.maps.geometry.spherical.computeDistanceBetween(pLL, interp);
 }
 
+//for smart reroute
 function distanceToPathMeters(p, path) {
   if (!path || path.length < 2) return Infinity;
+
   let best = Infinity;
   for (let i = 0; i < path.length - 1; i++) {
     const d = distancePointToSegmentMeters(p, path[i], path[i + 1]);
@@ -58,8 +62,9 @@ function distanceToPathMeters(p, path) {
   return best;
 }
 
+//for smart reroute
 function liveRerouteIfNeeded() {
-  if (!NAV_ACTIVE || !NAV_DEST) return;
+  if (!NAV_ACTIVE || !NAV_DEST || !userLocation) return;
 
   const now = Date.now();
 
@@ -71,35 +76,49 @@ function liveRerouteIfNeeded() {
 
   // read currently drawn route
   const currentPath =
-    window.routeLine?.getPath()?.getArray()?.map(ll => ({ lat: ll.lat(), lng: ll.lng() })) || null;
+    window.routeLine?.getPath()?.getArray()?.map(ll => ({
+      lat: ll.lat(),
+      lng: ll.lng()
+    })) || null;
 
   const offRoute =
-    currentPath ? (distanceToPathMeters(userLocation, currentPath) > OFF_ROUTE_METERS) : true;
+    currentPath
+      ? distanceToPathMeters(userLocation, currentPath) > OFF_ROUTE_METERS
+      : true;
 
   if (!offRoute && (tooSoon || tooLittleMove)) return;
 
-  // === origin logic (same as your getDirectionsToDept) ===
+  // don't keep rerouting when already near destination
+  const distToDest = distanceMeters(userLocation, NAV_DEST.position);
+  if (distToDest <= 20) return;
+
+  // same origin logic as main routing
   let nearestNode = getNearestRoutePoint(userLocation);
   const distToRoute = nearestNode ? distanceMeters(userLocation, nearestNode) : Infinity;
 
   let routingOrigin = userLocation;
   if (distToRoute > 35) {
     const { snapped: gatePoint } = snapUserToGateOnly(userLocation);
-    routingOrigin = gatePoint; // only for routing
+    routingOrigin = gatePoint;
   }
 
   const startPt = getNearestRoutePoint(routingOrigin);
-  const endPt = getNearestRoutePoint(NAV_TARGET_DEPT.position);
+  const endPt = getNearestRoutePoint(NAV_DEST.position);
+
   if (!startPt || !endPt) return;
 
   const path = shortestPath(CAMPUS_GRAPH, coordKey(startPt), coordKey(endPt));
+  if (!path || path.length < 2) return;
+
   drawCampusRoute(path);
 
-  // (optional) update steps live too
-  const steps = buildTurnByTurn(path, NAV_TARGET_DEPT.title);
+  const steps = buildTurnByTurn(path, NAV_DEST.title);
   renderDirectionsSteps(steps);
+
   lastRerouteTime = now;
   lastReroutePos = { ...userLocation };
+
+  console.log("🔄 Route updated from current location");
 }
 
 // optional: expose stop button
