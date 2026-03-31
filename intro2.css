@@ -547,6 +547,17 @@ h1 {
     pointer-events: auto !important;
   }
 
+  #s3 .screen3-ui {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+#s3 .logo-left,
+#s3 .get-started-btn {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
   html,
   body {
     width: 100%;
