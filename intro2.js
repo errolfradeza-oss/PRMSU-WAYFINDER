@@ -5,6 +5,8 @@ let locked = false;
 let currentScreen = 1;
 let screen2Shown = false;
 
+const IS_MOBILE = window.matchMedia("(max-width: 768px), (hover: none) and (pointer: coarse)").matches;
+
 function runScreenReveals(screenNumber) {
   if (screenNumber === 2) {
     screen2Shown = true;
