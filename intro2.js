@@ -84,10 +84,40 @@ function goLogin() {
 }
 
 window.addEventListener("load", () => {
-  currentScreen = 1;
-
   const s1 = document.getElementById("s1");
+  const s2 = document.getElementById("s2");
   const s3 = document.getElementById("s3");
+  const ui = document.getElementById("screen3UI");
+  const ramon = document.getElementById("screen3Ramon");
+
+  if (IS_MOBILE) {
+    if (s1) s1.classList.remove("active");
+    if (s2) s2.classList.remove("active");
+    if (s3) s3.classList.add("active");
+
+    currentScreen = 3;
+    locked = false;
+
+    if (ramon) ramon.classList.add("show");
+    if (ui) ui.classList.add("show");
+
+    if (s3) {
+      s3.addEventListener("click", (e) => {
+        if (locked) return;
+
+        if (e.target.closest(".get-started-btn")) {
+          goLogin();
+          return;
+        }
+
+        goLogin();
+      });
+    }
+
+    return;
+  }
+
+  currentScreen = 1;
 
   if (s1) {
     s1.addEventListener("click", () => {

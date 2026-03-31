@@ -534,6 +534,19 @@ h1 {
 /* ================================================= */
 
 @media (max-width: 768px) {
+
+  /* force mobile to only use screen 3 */
+  #s1,
+  #s2 {
+    display: none !important;
+  }
+
+  #s3 {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+
   html,
   body {
     width: 100%;
