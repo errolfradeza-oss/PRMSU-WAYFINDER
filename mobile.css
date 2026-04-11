@@ -220,7 +220,7 @@
     transform: none !important;
     gap: 50px !important;
     padding: 8px !important;
-    z-index: 9999 !important;
+    z-index: 8000 !important;
     pointer-events: auto !important;
   }
 
@@ -245,5 +245,6 @@
   .directions-panel{
     width: 78vw !important;
     max-width: 78vw !important;
+    z-index: 10000 !important;
   }
 }
