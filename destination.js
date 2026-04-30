@@ -35,10 +35,10 @@ function renderDirectionsSteps(steps) {
     const icon = document.createElement("div");
     icon.className = "dir-step-icon";
     icon.textContent =
-      s.type === "turn" ? (s.dir === "left" ? "⬅" : "➡") :
+      s.type === "turn" ? (s.dir === "left" ? "←" : "→") :
       s.type === "arrive" ? "●" :
-      s.type === "start" ? "⬆" :
-      "⬇";
+      s.type === "start" ? "↑" :
+      "↓";
 
     const text = document.createElement("div");
     text.className = "dir-step-text";
