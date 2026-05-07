@@ -220,7 +220,7 @@
     transform: none !important;
     gap: 50px !important;
     padding: 8px !important;
-    z-index: 8000 !important;
+    z-index: 850 !important;
     pointer-events: auto !important;
   }
 

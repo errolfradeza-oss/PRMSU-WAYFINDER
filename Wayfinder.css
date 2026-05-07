@@ -682,7 +682,7 @@ html, body{
   right: -80px;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 999;
+  z-index: 850;
 
   padding: 12px 10px;
 
