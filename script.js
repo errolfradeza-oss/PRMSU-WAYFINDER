@@ -785,7 +785,6 @@ function getUserLocation() {
 }
 //for accessibility features
 function nearestComfortRoom() {
-
 if (!userLocation) {
         alert("Current location not available.");
         return;
