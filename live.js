@@ -5,6 +5,8 @@ let NAV_DEST = null; // store dept object
 let lastRerouteTime = 0;
 let lastReroutePos = null;
 
+let currentHeading = null; // for compass
+
 const REROUTE_MIN_MS = 1200;   // don't reroute too often
 const REROUTE_MIN_METERS = 7;  // reroute only if user moved enough
 const OFF_ROUTE_METERS = 18;   // reroute faster if user is off the line
@@ -124,6 +126,69 @@ function liveRerouteIfNeeded() {
 // optional: expose stop button
 window.stopLiveNavigation = stopLiveNavigation;
 
+// for compass
+function startCompass() {
+  if (!window.DeviceOrientationEvent) {
+    console.warn("Compass not supported");
+    return;
+  }
+
+  window.addEventListener("deviceorientation", (e) => {
+    let heading = null;
+
+    // iPhone
+    if (typeof e.webkitCompassHeading === "number") {
+      heading = e.webkitCompassHeading;
+    }
+    // Android
+    else if (e.alpha != null) {
+      heading = (360 - e.alpha) % 360;
+    }
+
+    if (heading != null) {
+      currentHeading = heading;
+
+      document.title = heading.toFixed(0);
+      
+      if (NAV_ACTIVE && userLocation) {
+        updateStepsLive(userLocation);
+    }
+    }
+  });
+}
+
+// for compass
+function relativeAngle(current, target) {
+    let diff = target - current;
+
+    while (diff > 180) diff -= 360;
+    while (diff < -180) diff += 360;
+
+    return diff;
+}
+
+function headingInstruction(diff) {
+
+    if (Math.abs(diff) < 15)
+        return "⬆ Walk Forward";
+
+    if (diff >= 15 && diff < 45)
+        return "↗ Slight Right";
+
+    if (diff >= 45 && diff < 120)
+        return "➡ Turn Right";
+
+    if (diff >= 120)
+        return "↩ Turn Around";
+
+    if (diff <= -15 && diff > -45)
+        return "↖ Slight Left";
+
+    if (diff <= -45 && diff > -120)
+        return "⬅ Turn Left";
+
+    return "↩ Turn Around";
+}
 
 
 //offscreen pointer helper

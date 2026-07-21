@@ -431,6 +431,8 @@ const locations = [
     image: "internal/College of Tourism and Hospitality Management.webp",
     overview: "College of Tourism and Hospitality Management overview info.",
     about: "About PRMSU College of Tourism and Hospitality Management."
+
+
   },
   // GAD
   {
@@ -438,14 +440,18 @@ const locations = [
     title: "PRMSU Gender and Society Development (GAD)",
     icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
     image: "internal/Gender and Development Center.webp",
+    facilities: ["restroom"],
     overview: "PRMSU Gender and Society Development overview info.",
     about: "About PRMSU Gender and Society Development."
+
+  
   },
   {
     position: { lat: 15.316957, lng: 119.9831708 },
     title: "College of Communication and Information Technology",
     icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
     image: "internal/CCIT.jpg",
+    facilities: ["restroom"],
     gallery: [
       "internal/CCIT1.jpg",
       //"internal/CCIT2.jpg",
@@ -481,6 +487,7 @@ const locations = [
     title: "College of Industrial Technology",
     icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
     image: "internal/College of Industrial Technology.jpg",
+    facilities: ["restroom"],
     overview: "CIT overview info.",
     about: "The College of Industrial Technology (CIT) at PRMSU offers industry-responsive programs like BS Industrial Technology, preparing students for careers in industrial tech, management, and teaching.",
     
@@ -493,6 +500,7 @@ const locations = [
     title: "College of Engineering",
     icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
     image: "internal/COE.jpg",
+    facilities: ["restroom"],
     overview: "Engineering overview info.",
     about: "About College of Engineering.",
     panoScene: null,
@@ -503,6 +511,7 @@ const locations = [
     title: "College of Physical Education",
     icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
     image: "internal/College of Physical Education.jpg",
+    facilities: ["restroom"],
     overview: "Physical Education overview info.",
     about: "About College of Physical Education.",
     panoScene: null,
@@ -513,6 +522,7 @@ const locations = [
     title: "PRMSU Gymnasium",
     icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
     image: "internal/GYMNASIUM.jpg",
+    facilities: ["restroom"],
     overview: "PRMSU Gymnasium overview info.",
     about: {
     sections: [
@@ -532,6 +542,7 @@ const locations = [
     title: "Science and Engineering Laboratory Building",
     icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
     image: "internal/COELAB.jpg",
+    facilities: ["restroom"],
     overview: "Science and Engineering Lab overview info.",
     about: "About Science and Engineering Lab.",
     panoScene: null,
@@ -542,6 +553,7 @@ const locations = [
     title: "College of Accountancy & Business Administration",
     icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
     image: "internal/CBAPA.jpg",
+    facilities: ["restroom"],
     overview: "CABA overview info.",
     about: "About College of Accountancy & Business Administration.",
     panoScene: null,
@@ -592,6 +604,7 @@ const locations = [
     title: "PRMSU Cafeteria",
     icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
     image: "internal/Cafeteria.jpg",
+    facilities: ["restroom"],
     overview: "Cafeteria overview info.",
     about: "About PRMSU Cafeteria.",
     panoScene: null,
@@ -602,6 +615,7 @@ const locations = [
     title: "PRMSU New Graduate School Building",
     icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
     image: "internal/New Graduate School Building.jfif",
+    facilities: ["restroom"],
     overview: "New Graduate School overview info.",
     about: "About PRMSU New Graduate School Building.",
     panoScene: null,
@@ -612,6 +626,7 @@ const locations = [
     title: "President Ramon Magsaysay Statue",
     icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
     image: "internal/RAMON.jpg",
+    facilities: ["restroom"],
     overview: "Statue overview info.",
     about: "About PRMSU Statue.",
     panoScene: null,
@@ -622,6 +637,7 @@ const locations = [
     title: "President Ramon Magsaysay State University",
     icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
     image: "internal/ADMIN.jpg",
+    facilities: ["restroom"],
     overview: "PRMSU overview info.",
     about: "About PRMSU campus.",
     panoScene: null,
@@ -632,6 +648,7 @@ const locations = [
     title: "College of Arts & Science New Building",
     icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
     image: "internal/College of Arts & Science New Building.jfif",
+    facilities: ["restroom"],
     overview: "CAS overview info.",
     about: "About College of Arts & Science.",
     panoScene: null,
@@ -642,6 +659,7 @@ const locations = [
     title: "College of Teacher Education",
     icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
     image: "internal/Collage of Teachers Education.jfif",
+    facilities: ["restroom"],
     overview: "CTE overview info.",
     about: "About College of Teacher Education.",
     panoScene: null,
@@ -652,6 +670,7 @@ const locations = [
     title: "PRMSU E-Library",
     icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
     image: "internal/elib.jpg",
+    facilities: ["restroom"],
     overview: "E-Library overview info.",
     about: "About PRMSU E-Library.",
     panoScene: null,
@@ -662,6 +681,7 @@ const locations = [
     title: "PRMSU Laboratory Highschool",
     icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
     image: "internal/High School.jfif",
+    facilities: ["restroom"],
     overview: "Laboratory Highschool overview info.",
     about: "About PRMSU Laboratory Highschool.",
     panoScene: null,
@@ -682,6 +702,7 @@ const locations = [
     title: "College of Arts & Science Old Building",
     icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
     image: "internal/College of Arts & Science Old Building.jfif",
+    facilities: ["restroom"],
     overview: "College of Arts & Science Old Building overview info.",
     about: "About PRMSU College of Arts & Science Old Building.",
     panoScene: null,
@@ -716,6 +737,7 @@ const locations = [
     about: "About PRMSU Back Gate.",
     panoScene: null,
     panoPreview: null
+
   },
   {
     position: { lat: 15.3197159, lng: 119.984991 },
@@ -741,6 +763,7 @@ const locations = [
     title: "Bachelor of Science in Nursing",
     icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
     image: "internal/Collage of Nursing.jfif",
+    facilities: ["restroom"],
     overview: "BSN overview info.",
     about: {
   sections: [

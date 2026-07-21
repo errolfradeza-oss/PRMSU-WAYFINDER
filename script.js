@@ -673,6 +673,8 @@ marker.addListener("click", () => {
   setupSearchPanel(map, locations);
   setupLocationPrePrompt();
   
+  // for compass
+  startCompass();
 
 }
 
@@ -781,7 +783,49 @@ function getUserLocation() {
     }
   );
 }
+//for accessibility features
+function nearestComfortRoom() {
+  if (!userLocation) {
+        alert("Current location not available.");
+        return;
+    }
 
+    // Buildings that contain a restroom
+    const restroomBuildings = locations.filter(loc =>
+        loc.facilities &&
+        loc.facilities.includes("restroom")
+    );
+
+    if (!restroomBuildings.length) {
+        alert("No restroom locations found.");
+        return;
+    }
+
+    let nearest = null;
+    let shortest = Infinity;
+
+    restroomBuildings.forEach(loc => {
+
+        const d = distanceMeters(
+            userLocation,
+            loc.position
+        );
+
+        if (d < shortest) {
+            shortest = d;
+            nearest = loc;
+        }
+
+    });
+
+    if (!nearest) {
+        alert("Unable to locate nearest restroom.");
+        return;
+    }
+
+    // Automatically navigate
+    getDirectionsToDept(nearest);
+}
 //old
 function getUserLocationPrompt() {
   setupLocationPrePrompt();

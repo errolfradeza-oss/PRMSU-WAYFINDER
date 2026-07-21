@@ -119,6 +119,8 @@ function buildTurnByTurn(pathPoints, destinationName = "Destination") {
     const h1 = google.maps.geometry.spherical.computeHeading(A, B);
     const h2 = google.maps.geometry.spherical.computeHeading(B, C);
 
+    const bearing = (h2 + 360) % 360;
+
     let delta = h2 - h1;
     delta = ((delta + 540) % 360) - 180;
 
@@ -131,9 +133,11 @@ function buildTurnByTurn(pathPoints, destinationName = "Destination") {
     const dir = delta > 0 ? "right" : "left";
     const sharp = abs >= STRONG_TURN_DEG ? "Sharp " : "";
 
+    // modified
     steps.push({
       type: "turn",
       dir,
+      bearing,
       text: `${sharp}turn ${dir}`,
       baseText: `${sharp}turn ${dir}`,
       atIndex: i,
@@ -176,10 +180,27 @@ function updateStepsLive(userLoc) {
   }
 
   const updated = LIVE_STEPS.map((s) => {
+    // modified
     if (s.type === "turn") {
-      const d = distanceMeters(userLoc, s.at);
-      return { ...s, text: `${s.baseText} in ${formatDistance(d)}` };
+
+    const d = distanceMeters(userLoc, s.at);
+
+    let text = `${s.baseText} in ${formatDistance(d)}`;
+
+    if (currentHeading != null && s.bearing != null) {
+
+        const diff = relativeAngle(currentHeading, s.bearing);
+
+        text =
+            `${headingInstruction(diff)}\n${formatDistance(d)}`;
+
     }
+
+    return {
+        ...s,
+        text
+    };
+}
 
     if (s.type === "arrive") {
       const d = distanceMeters(userLoc, s.at);
