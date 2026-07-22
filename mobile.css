@@ -219,7 +219,7 @@
     top: auto !important;
     bottom: 300px !important;
     transform: none !important;
-    gap: 50px !important;
+    gap: 20px !important;
     padding: 8px !important;
     z-index: 999999999 !important;
     pointer-events: auto !important;
