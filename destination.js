@@ -11,20 +11,18 @@ function formatDistance(meters) {
 
 //helper function for compass
 function getCurrentStep(userLoc, steps) {
-    let current = 0;
 
     for (let i = 0; i < steps.length; i++) {
 
         const d = distanceMeters(userLoc, steps[i].at);
 
-        if (d < 8) {
-            current = Math.min(i + 1, steps.length - 1);
-        } else {
-            break;
+        if (d > 8) {
+            return i;
         }
+
     }
 
-    return current;
+    return steps.length - 1;
 }
 
 //main code for destination page
@@ -230,41 +228,93 @@ function updateStepsLive(userLoc) {
 
   const updated = LIVE_STEPS.map((s, index) => {
     // modified turn
-    if (s.type === "turn" && index === currentStep) {
+    // Only update the CURRENT step
+    if (index === currentStep) {
 
-    const d = distanceMeters(userLoc, s.at);
+        // ---------------- TURN ----------------
+        if (s.type === "turn") {
 
-    let targetBearing;
+            const d = distanceMeters(userLoc, s.at);
 
-    // More than 8m away?
-    if (d > 8) {
-        targetBearing = s.approachBearing;
-    } else {
-        targetBearing = s.exitBearing;
+            const targetBearing =
+                d > 8 ? s.approachBearing : s.exitBearing;
+
+            const diff = relativeAngle(currentHeading, targetBearing);
+
+            return {
+                ...s,
+                text:
+    `${headingInstruction(diff)}
+    ${formatDistance(d)}`
+            };
+        }
+
+        // ---------------- CONTINUE ----------------
+        if (s.type === "continue") {
+
+            const d = distanceMeters(userLoc, s.at);
+
+            const next = LIVE_STEPS[index + 1];
+
+            if (next && next.at) {
+
+                const targetBearing =
+                    google.maps.geometry.spherical.computeHeading(
+                        new google.maps.LatLng(userLoc.lat, userLoc.lng),
+                        new google.maps.LatLng(next.at.lat, next.at.lng)
+                    );
+
+                const diff = relativeAngle(
+                    currentHeading,
+                    (targetBearing + 360) % 360
+                );
+
+                return {
+                    ...s,
+                    text:
+    `${headingInstruction(diff)}
+    ${formatDistance(d)}`
+                };
+            }
+
+            return {
+                ...s,
+                text: `${formatDistance(d)}`
+            };
+        }
     }
 
-    const diff = relativeAngle(currentHeading, targetBearing);
-
-    return {
-        ...s,
-        text:
-            `${headingInstruction(diff)}\n${formatDistance(d)}`
-    };
-}
-
+    // ---------------- ARRIVE ----------------
     if (s.type === "arrive") {
-      const d = distanceMeters(userLoc, s.at);
-      if (d <= 8) return { ...s, text: `Arrived ✅` };
-      return { ...s, text: `${s.baseText} (${formatDistance(d)})` };
+
+        const d = distanceMeters(userLoc, s.at);
+
+        if (d <= 8)
+            return {
+                ...s,
+                text: "Arrived ✅"
+            };
+
+        return {
+            ...s,
+            text: `${s.baseText} (${formatDistance(d)})`
+        };
     }
 
+    // Update distance for non-active continue steps
     if (s.type === "continue") {
-      const d = distanceMeters(userLoc, s.at);
-      return { ...s, text: `${s.baseText} for ~${formatDistance(d)}` };
+
+        const d = distanceMeters(userLoc, s.at);
+
+        return {
+            ...s,
+            text: `${s.baseText} for ~${formatDistance(d)}`
+        };
     }
 
     return s;
   });
 
+  LIVE_STEPS = updated;
   renderDirectionsSteps(updated);
 }

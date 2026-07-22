@@ -114,8 +114,8 @@ function liveRerouteIfNeeded() {
 
   drawCampusRoute(path);
 
-  const steps = buildTurnByTurn(path, NAV_DEST.title);
-  renderDirectionsSteps(steps);
+  LIVE_STEPS = buildTurnByTurn(path, NAV_DEST.title);
+  renderDirectionsSteps(LIVE_STEPS);
 
   lastRerouteTime = now;
   lastReroutePos = { ...userLocation };
