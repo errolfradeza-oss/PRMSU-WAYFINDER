@@ -214,12 +214,12 @@
 
   .zoom-slider-container{
     left: auto !important;
-    right: 10px !important;
-    right: 10px !important;
+    right: 5px !important;
+    right: 5px !important;
     top: auto !important;
     bottom: 300px !important;
     transform: none !important;
-    gap: 20px !important;
+    gap: 50px !important;
     padding: 8px !important;
     z-index: 999999999 !important;
     pointer-events: auto !important;
