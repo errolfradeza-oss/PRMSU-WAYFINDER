@@ -706,7 +706,7 @@ function getUserLocation() {
     (pos) => {
 
       if (pos.coords.accuracy > 15) return;
-      
+
       userLocation = {
         lat: pos.coords.latitude,
         lng: pos.coords.longitude
@@ -714,7 +714,6 @@ function getUserLocation() {
 
       updateOffscreenArrow();
 
-      // Create glow circle once, then update center
       if (!window.userGlow) {
         window.userGlow = new google.maps.Circle({
           map: map,
