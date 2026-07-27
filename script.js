@@ -704,6 +704,9 @@ function getUserLocation() {
 
   navigator.geolocation.watchPosition(
     (pos) => {
+
+      if (pos.coords.accuracy > 15) return;
+      
       userLocation = {
         lat: pos.coords.latitude,
         lng: pos.coords.longitude
