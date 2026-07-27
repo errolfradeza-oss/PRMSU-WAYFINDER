@@ -742,7 +742,7 @@ function getUserLocation() {
         });
       } else {
         window.userGlow.setCenter(userLocation);
-        window.userGlow.setRadius(pos.coords.accuracy);
+        //window.userGlow.setRadius(pos.coords.accuracy);
       }
 
       // Optional GPS debug text
