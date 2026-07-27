@@ -705,7 +705,7 @@ function getUserLocation() {
   navigator.geolocation.watchPosition(
       (pos) => {
 
-        if (pos.coords.accuracy > 40) return;
+        //if (pos.coords.accuracy > 40) return;
 
         const SMOOTHING = 0.35;
 
