@@ -733,7 +733,7 @@ function getUserLocation() {
         window.userGlow = new google.maps.Circle({
           map: map,
           center: userLocation,
-          radius: pos.coords.accuracy, // meters
+          radius: 10, // meters
           strokeColor: "#1e90ff",
           strokeOpacity: 0,
           fillColor: "#1e90ff",
