@@ -703,14 +703,29 @@ function getUserLocation() {
   }
 
   navigator.geolocation.watchPosition(
-    (pos) => {
+      (pos) => {
 
-      if (pos.coords.accuracy > 15) return;
+        if (pos.coords.accuracy > 40) return;
+
+        const SMOOTHING = 0.35;
+
+  const newPos = {
+      lat: pos.coords.latitude,
+      lng: pos.coords.longitude
+  };
+
+  if (!userLocation) {
+
+      userLocation = newPos;
+
+  } else {
 
       userLocation = {
-        lat: pos.coords.latitude,
-        lng: pos.coords.longitude
+          lat: userLocation.lat * (1 - SMOOTHING) + newPos.lat * SMOOTHING,
+          lng: userLocation.lng * (1 - SMOOTHING) + newPos.lng * SMOOTHING
       };
+
+  }
 
       updateOffscreenArrow();
 
@@ -718,7 +733,7 @@ function getUserLocation() {
         window.userGlow = new google.maps.Circle({
           map: map,
           center: userLocation,
-          radius: 10, // meters
+          radius: pos.coords.accuracy, // meters
           strokeColor: "#1e90ff",
           strokeOpacity: 0,
           fillColor: "#1e90ff",
@@ -727,6 +742,7 @@ function getUserLocation() {
         });
       } else {
         window.userGlow.setCenter(userLocation);
+        window.userGlow.setRadius(pos.coords.accuracy);
       }
 
       // Optional GPS debug text
@@ -781,7 +797,7 @@ function getUserLocation() {
     {
       enableHighAccuracy: true,
       maximumAge: 0,
-      timeout: 15000
+      timeout: 30000
     }
   );
 }
