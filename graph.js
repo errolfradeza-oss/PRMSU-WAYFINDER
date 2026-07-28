@@ -417,7 +417,7 @@ const locations = [
   sections: [
     {
       title: "PRMSU Dormitory",
-      icon: "🏢",
+      
       description: "The PRMSU Dormitory is a university-managed residential facility that provides safe and convenient accommodation for students, especially those coming from distant areas. It offers designated rooms, shared comfort rooms, and common spaces that support both study and community living."
 
     }
@@ -464,17 +464,17 @@ const locations = [
   sections: [
     {
       title: "Ground Floor",
-      icon: "🏢",
+      
       description: "Contains the Dean’s Office, Office of the Program Chair, Faculty Room, Multimedia Room, and Comfort Rooms (CR). This floor handles academic consultations and administrative services."
     },
     {
       title: "Second Floor",
-      icon: "💻",
+    
       description: "Houses three Computer Laboratories used for programming, database, and system development classes."
     },
     {
       title: "Third Floor",
-      icon: "🧑‍💻",
+    
       description: "Contains two Computer Laboratories used for programming, database, and system development classes."
     }
   ],
@@ -528,7 +528,7 @@ const locations = [
     sections: [
     {
       title: " PRMSU Gymnasium",
-      icon: "🏟️",
+    
       description: "The PRMSU Gymnasium is a multi-purpose sports facility that hosts athletic activities, physical education classes, and university events. It is equipped to accommodate indoor sports, training sessions, and gatherings, providing a central space for student recreation and campus programs."
    
     }
@@ -769,17 +769,17 @@ const locations = [
   sections: [
     {
       title: "College of Nursing & CCIT Building",
-      icon: "🏫",
+    
       description: "The building houses both the College of Nursing (CON) and the College of Computing and Information Technology (CCIT)."
     },
     {
       title: "College of Nursing (CON)",
-      icon: "🏫",
+      
       description: "The CON side includes faculty offices, a science laboratory, an amphitheater, the SBO room, and six lecture rooms, supporting the academic needs of nursing students."
     },
     {
       title: "College of Computing and Information Technology (CCIT)",
-      icon: "🏫",
+  
       description: "The CCIT side has five lecture rooms and the SBO office on the ground floor, and three lecture rooms on the second floor, providing spaces for classes and administrative activities."
     }
   ]
