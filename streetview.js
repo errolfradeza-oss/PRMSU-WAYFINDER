@@ -95,7 +95,7 @@ const scenes = {
                 "type": "scene",
                 "text": "nursing",
                 "sceneId": "nursing_entrance",
-                "targetYaw": 1
+                "targetYaw": 180
             }
             
             
