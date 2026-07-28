@@ -60,8 +60,12 @@ const scenes = {
             
         ]
     },
+    "ccit_step5": {
+        "title": "CCIT 1st Floor - Step 4",
+        "type": "equirectangular",
+        "panorama": "images/PANO_20260123_142712.jpg"},
 
-     "ccit_step4": {
+    "ccit_step4": {
         "title": "CCIT 1st Floor - Step 4",
         "type": "equirectangular",
         "panorama": "images/PANO_20260307_170010.jpg",
