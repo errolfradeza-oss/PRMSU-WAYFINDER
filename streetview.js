@@ -81,6 +81,7 @@ const scenes = {
                 "sceneId": "nursing_entrance"
             }
             
+            
         ]
     },
 
@@ -102,8 +103,18 @@ const scenes = {
     "nursing_2nd_step": {
         "title": "Nursing 1st Floor 2nd Step",
         "type": "equirectangular",
-        "panorama": "images/leftside_nursing_near_stairs.jpg"
-        
+        "panorama": "images/leftside_nursing_near_stairs.jpg",
+         "hotSpots": [
+            {
+                "pitch": -5,
+                "yaw": 180,
+                "type": "scene",
+                "text": "Nursing 1st Floor Hallway",
+                "sceneId": "nursing_2nd_step"
+          
+           
+          }
+        ]
     }
 };
 
