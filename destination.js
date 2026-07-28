@@ -62,6 +62,7 @@ function renderDirectionsSteps(steps) {
     const icon = document.createElement("div");
     icon.className = "dir-step-icon";
 
+    //potangina dto
     icon.textContent =
       s.type === "turn" ? (s.dir === "left" ? "←" : "→") :
       s.type === "arrive" ? "●" :
@@ -73,7 +74,7 @@ function renderDirectionsSteps(steps) {
     text.textContent = s.text;
 
     row.append(num, icon, text);
-    box.appendChild(row);
+    box.appendChild(row); 
   });
 
   // Automatically keep current step visible
@@ -84,6 +85,9 @@ function renderDirectionsSteps(steps) {
     });
   }
 }
+
+//dto ung update steps
+
 
 function buildTurnByTurn(pathPoints, destinationName = "Destination") {
   if (!pathPoints || pathPoints.length < 2) return [];
@@ -218,7 +222,8 @@ function updateStepsLive(userLoc) {
   const isOutsideCampus = campusBounds && !campusBounds.contains(userLL);
   //new added
   const currentStep = getCurrentStep(userLoc, LIVE_STEPS);
-  currentStepIndex = getCurrentStep(userLoc, LIVE_STEPS);
+  currentStepIndex = currentStep;
+  //currentStepIndex = getCurrentStep(userLoc, LIVE_STEPS);
 
   // If outside campus, keep the original gate-based steps untouched
   if (isOutsideCampus) {
