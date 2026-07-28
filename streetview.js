@@ -72,7 +72,15 @@ const scenes = {
                 "type": "scene",
                 "text": "CCIT 1st Floor Hallway",
                 "sceneId": "ccit_step3"
+            },
+            {
+                "pitch": 1,
+                "yaw": 0,
+                "type": "scene",
+                "text": "nursing",
+                "sceneId": "nursing_entrance"
             }
+            
         ]
     },
 
