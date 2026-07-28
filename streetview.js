@@ -75,7 +75,7 @@ const scenes = {
             },
             {
                 "pitch": 1,
-                "yaw": 0,
+                "yaw": 1,
                 "type": "scene",
                 "text": "nursing",
                 "sceneId": "nursing_entrance"
