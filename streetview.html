@@ -10,6 +10,32 @@
 
     <!-- YOUR CSS FILE -->
     <link rel="stylesheet" href="streetview.css">
+    <style>
+        /* Floating Exit Button Style */
+        .exit-pano-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 99999;
+            background-color: rgba(0, 0, 0, 0.75);
+            color: #ffffff;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            padding: 8px 16px;
+            font-size: 14px;
+            font-family: inherit;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .exit-pano-btn:hover {
+            background-color: rgba(220, 38, 38, 0.9);
+            border-color: #ef4444;
+            transform: scale(1.05);
+        }
+    </style>
 </head>
 <body>
     <button class="exit-pano-btn" onclick="window.location.href='index.html'">✕ Exit 360°</button>
