@@ -213,21 +213,31 @@
   }
 
   .zoom-slider-container{
-    left: auto !important;
-    right: 10px !important;
-    right: 10px !important;
-    top: auto !important;
+    position: fixed !important;
+    right: 16px !important;
     bottom: 300px !important;
+
+    top: auto !important;
+    left: auto !important;
+
     transform: none !important;
-    gap: 50px !important;
-    padding: 8px !important;
-    z-index: 999999999 !important;
-    pointer-events: auto !important;
-  }
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: 40px !important;
+    height: 170px !important;
+
+    padding: 0 !important;
+}
 
   #zoomSlider{
-    width: 140px !important;
-  }
+    width: 170px !important;
+    margin: 0 !important;
+    transform: rotate(-90deg) !important;
+    transform-origin: center center !important;
+}
 
   button, .tab-btn, input{
     min-height: 44px !important;

@@ -1,9 +1,28 @@
+//for dir panel highlighting
+let currentStepIndex = 0;
+
 //helper function for m to km 
 function formatDistance(meters) {
   if (meters >= 1000) {
     return (meters / 1000).toFixed(2) + " km";
   }
   return Math.round(meters) + " m";
+}
+
+//helper function for compass
+function getCurrentStep(userLoc, steps) {
+
+    for (let i = 0; i < steps.length; i++) {
+
+        const d = distanceMeters(userLoc, steps[i].at);
+
+        if (d > 8) {
+            return i;
+        }
+
+    }
+
+    return steps.length - 1;
 }
 
 //main code for destination page
@@ -18,15 +37,23 @@ function setDestination(deptName) {
   to.value = deptName;
 }
 
+//new modified
 function renderDirectionsSteps(steps) {
   const box = document.getElementById("dirSteps");
   if (!box) return;
 
   box.innerHTML = "";
 
+  let activeRow = null;
+
   steps.forEach((s, i) => {
     const row = document.createElement("div");
     row.className = "dir-step";
+
+    if (i === currentStepIndex) {
+      row.classList.add("active");
+      activeRow = row;
+    }
 
     const num = document.createElement("div");
     num.className = "dir-step-num";
@@ -34,22 +61,28 @@ function renderDirectionsSteps(steps) {
 
     const icon = document.createElement("div");
     icon.className = "dir-step-icon";
+
     icon.textContent =
       s.type === "turn" ? (s.dir === "left" ? "←" : "→") :
       s.type === "arrive" ? "●" :
       s.type === "start" ? "↑" :
-      "↓";
+      "↑";
 
     const text = document.createElement("div");
     text.className = "dir-step-text";
     text.textContent = s.text;
 
-    row.appendChild(num);
-    row.appendChild(icon);
-    row.appendChild(text);
-
+    row.append(num, icon, text);
     box.appendChild(row);
   });
+
+  // Automatically keep current step visible
+  if (activeRow) {
+    activeRow.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+  }
 }
 
 function buildTurnByTurn(pathPoints, destinationName = "Destination") {
@@ -119,7 +152,8 @@ function buildTurnByTurn(pathPoints, destinationName = "Destination") {
     const h1 = google.maps.geometry.spherical.computeHeading(A, B);
     const h2 = google.maps.geometry.spherical.computeHeading(B, C);
 
-    const bearing = (h2 + 360) % 360;
+    const approachBearing = (h1 + 360) % 360;
+    const exitBearing = (h2 + 360) % 360;
 
     let delta = h2 - h1;
     delta = ((delta + 540) % 360) - 180;
@@ -137,12 +171,22 @@ function buildTurnByTurn(pathPoints, destinationName = "Destination") {
     steps.push({
       type: "turn",
       dir,
-      bearing,
+
+      // direction of the road BEFORE the turn
+      approachBearing,
+
+      // direction AFTER turning
+      exitBearing,
+
       text: `${sharp}turn ${dir}`,
       baseText: `${sharp}turn ${dir}`,
+
       atIndex: i,
-      at: { lat: B.lat(), lng: B.lng() }
-    });
+      at: {
+          lat: B.lat(),
+          lng: B.lng()
+      }
+  });
   }
 
   // final continue ends at last point
@@ -172,6 +216,9 @@ function updateStepsLive(userLoc) {
 
   const userLL = new google.maps.LatLng(userLoc.lat, userLoc.lng);
   const isOutsideCampus = campusBounds && !campusBounds.contains(userLL);
+  //new added
+  const currentStep = getCurrentStep(userLoc, LIVE_STEPS);
+  currentStepIndex = getCurrentStep(userLoc, LIVE_STEPS);
 
   // If outside campus, keep the original gate-based steps untouched
   if (isOutsideCampus) {
@@ -179,42 +226,95 @@ function updateStepsLive(userLoc) {
     return;
   }
 
-  const updated = LIVE_STEPS.map((s) => {
-    // modified
-    if (s.type === "turn") {
+  const updated = LIVE_STEPS.map((s, index) => {
+    // modified turn
+    // Only update the CURRENT step
+    if (index === currentStep) {
 
-    const d = distanceMeters(userLoc, s.at);
+        // ---------------- TURN ----------------
+        if (s.type === "turn") {
 
-    let text = `${s.baseText} in ${formatDistance(d)}`;
+            const d = distanceMeters(userLoc, s.at);
 
-    if (currentHeading != null && s.bearing != null) {
+            const targetBearing =
+                d > 8 ? s.approachBearing : s.exitBearing;
 
-        const diff = relativeAngle(currentHeading, s.bearing);
+            const diff = relativeAngle(currentHeading, targetBearing);
 
-        text =
-            `${headingInstruction(diff)}\n${formatDistance(d)}`;
+            return {
+                ...s,
+                text:
+    `${headingInstruction(diff)}
+    ${formatDistance(d)}`
+            };
+        }
 
+        // ---------------- CONTINUE ----------------
+        if (s.type === "continue") {
+
+            const d = distanceMeters(userLoc, s.at);
+
+            const next = LIVE_STEPS[index + 1];
+
+            if (next && next.at) {
+
+                const targetBearing =
+                    google.maps.geometry.spherical.computeHeading(
+                        new google.maps.LatLng(userLoc.lat, userLoc.lng),
+                        new google.maps.LatLng(next.at.lat, next.at.lng)
+                    );
+
+                const diff = relativeAngle(
+                    currentHeading,
+                    (targetBearing + 360) % 360
+                );
+
+                return {
+                    ...s,
+                    text:
+    `${headingInstruction(diff)}
+    ${formatDistance(d)}`
+                };
+            }
+
+            return {
+                ...s,
+                text: `${formatDistance(d)}`
+            };
+        }
     }
 
-    return {
-        ...s,
-        text
-    };
-}
-
+    // ---------------- ARRIVE ----------------
     if (s.type === "arrive") {
-      const d = distanceMeters(userLoc, s.at);
-      if (d <= 8) return { ...s, text: `Arrived ✅` };
-      return { ...s, text: `${s.baseText} (${formatDistance(d)})` };
+
+        const d = distanceMeters(userLoc, s.at);
+
+        if (d <= 8)
+            return {
+                ...s,
+                text: "Arrived ✅"
+            };
+
+        return {
+            ...s,
+            text: `${s.baseText} (${formatDistance(d)})`
+        };
     }
 
+    // Update distance for non-active continue steps
     if (s.type === "continue") {
-      const d = distanceMeters(userLoc, s.at);
-      return { ...s, text: `${s.baseText} for ~${formatDistance(d)}` };
+
+        const d = distanceMeters(userLoc, s.at);
+
+        return {
+            ...s,
+            text: `${s.baseText} for ~${formatDistance(d)}`
+        };
     }
 
     return s;
   });
 
+  LIVE_STEPS = updated;
   renderDirectionsSteps(updated);
 }

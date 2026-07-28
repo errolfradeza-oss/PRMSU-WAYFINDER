@@ -703,15 +703,32 @@ function getUserLocation() {
   }
 
   navigator.geolocation.watchPosition(
-    (pos) => {
+      (pos) => {
+
+        //if (pos.coords.accuracy > 40) return;
+
+        const SMOOTHING = 0.35;
+
+  const newPos = {
+      lat: pos.coords.latitude,
+      lng: pos.coords.longitude
+  };
+
+  if (!userLocation) {
+
+      userLocation = newPos;
+
+  } else {
+
       userLocation = {
-        lat: pos.coords.latitude,
-        lng: pos.coords.longitude
+          lat: userLocation.lat * (1 - SMOOTHING) + newPos.lat * SMOOTHING,
+          lng: userLocation.lng * (1 - SMOOTHING) + newPos.lng * SMOOTHING
       };
+
+  }
 
       updateOffscreenArrow();
 
-      // Create glow circle once, then update center
       if (!window.userGlow) {
         window.userGlow = new google.maps.Circle({
           map: map,
@@ -725,6 +742,7 @@ function getUserLocation() {
         });
       } else {
         window.userGlow.setCenter(userLocation);
+        //window.userGlow.setRadius(pos.coords.accuracy);
       }
 
       // Optional GPS debug text
@@ -779,18 +797,18 @@ function getUserLocation() {
     {
       enableHighAccuracy: true,
       maximumAge: 0,
-      timeout: 15000
+      timeout: 30000
     }
   );
 }
 //for accessibility features
 function nearestComfortRoom() {
-  if (!userLocation) {
+if (!userLocation) {
         alert("Current location not available.");
         return;
     }
 
-    // Buildings that contain a restroom
+    // Buildings that have restrooms
     const restroomBuildings = locations.filter(loc =>
         loc.facilities &&
         loc.facilities.includes("restroom")
@@ -801,30 +819,80 @@ function nearestComfortRoom() {
         return;
     }
 
+    // -----------------------------
+    // Determine routing origin
+    // -----------------------------
+    let routingOrigin = userLocation;
+
+    let startPt = getNearestRoutePoint(userLocation);
+    const distToRoute = startPt
+        ? distanceMeters(userLocation, startPt)
+        : Infinity;
+
+    // If user is outside campus, begin from nearest gate
+    if (distToRoute > 35) {
+        const { snapped } = snapUserToGateOnly(userLocation);
+        routingOrigin = snapped;
+    }
+
+    startPt = getNearestRoutePoint(routingOrigin);
+
+    if (!startPt) {
+        alert("Unable to determine your location on the campus routes.");
+        return;
+    }
+
+    // -----------------------------
+    // Find restroom with shortest WALKING distance
+    // -----------------------------
     let nearest = null;
-    let shortest = Infinity;
+    let shortestDistance = Infinity;
 
     restroomBuildings.forEach(loc => {
 
-        const d = distanceMeters(
-            userLocation,
-            loc.position
+        const endPt = getNearestRoutePoint(loc.position);
+
+        if (!endPt) return;
+
+        const path = shortestPath(
+            CAMPUS_GRAPH,
+            coordKey(startPt),
+            coordKey(endPt)
         );
 
-        if (d < shortest) {
-            shortest = d;
+        if (!path || path.length < 2) return;
+
+        let totalDistance = 0;
+
+        for (let i = 0; i < path.length - 1; i++) {
+            totalDistance += distanceMeters(
+                path[i],
+                path[i + 1]
+            );
+        }
+
+        if (totalDistance < shortestDistance) {
+            shortestDistance = totalDistance;
             nearest = loc;
         }
 
     });
 
     if (!nearest) {
-        alert("Unable to locate nearest restroom.");
+        alert("Unable to locate the nearest restroom.");
         return;
     }
 
-    // Automatically navigate
+    console.log(
+        "Nearest restroom:",
+        nearest.title,
+        "- Walking distance:",
+        Math.round(shortestDistance),
+        "meters"
+    );
+
     getDirectionsToDept(nearest);
+
 }
 //old
 function getUserLocationPrompt() {

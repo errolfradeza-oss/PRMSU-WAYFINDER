@@ -346,6 +346,32 @@ html, body{
   transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 
+/* new added */
+/* Current navigation step */
+.dir-step.active{
+    background: #1a73e8;
+    color: white;
+    border-color: #1a73e8;
+    transform: scale(1.02);
+    box-shadow: 0 8px 18px rgba(26,115,232,.25);
+}
+
+.dir-step.active .dir-step-num{
+    background: white;
+    color: #1a73e8;
+    border-color: white;
+}
+
+.dir-step.active .dir-step-icon{
+    background: rgba(255,255,255,.2);
+    color: white;
+    border-color: rgba(255,255,255,.35);
+}
+
+.dir-step.active .dir-step-text{
+    color: white;
+}
+/* old */
 .dir-step:hover{
   background: #eef1f6;
   transform: translateY(-1px);
