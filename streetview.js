@@ -60,8 +60,22 @@ const scenes = {
             
         ]
     },
+    "ccit_step5": {
+        "title": "CCIT 1st Floor - Step 4",
+        "type": "equirectangular",
+        "panorama": "images/PANO_20260123_142712.jpg",
+        "hotSpots": [
+            {
+                "pitch": -5,
+                "yaw": 180,
+                "type": "scene",
+                "text": "CCIT 1st Floor Hallway",
+                "sceneId": "ccit_step3"}
+            ]
+            },
 
-     "ccit_step4": {
+
+    "ccit_step4": {
         "title": "CCIT 1st Floor - Step 4",
         "type": "equirectangular",
         "panorama": "images/PANO_20260307_170010.jpg",
@@ -72,7 +86,16 @@ const scenes = {
                 "type": "scene",
                 "text": "CCIT 1st Floor Hallway",
                 "sceneId": "ccit_step3"
+            },
+            {
+                "pitch": 1,
+                "yaw": 1,
+                "type": "scene",
+                "text": "nursing",
+                "sceneId": "nursing_entrance"
             }
+            
+            
         ]
     },
 
@@ -80,7 +103,32 @@ const scenes = {
     "nursing_entrance": {
         "title": "Nursing 1st Floor Entrance",
         "type": "equirectangular",
-        "panorama": "images/leftside_nursing_near_stairs.jpg"
+        "panorama": "images/nursing_2.jpg",
+        "hotSpots": [
+            {
+                "pitch": -5,
+                "yaw": 180,
+                "type": "scene",
+                "text": "Nursing 1st Floor Hallway",
+                "sceneId": "nursing_2nd_step"
+            }
+        ]
+    },
+    "nursing_2nd_step": {
+        "title": "Nursing 1st Floor 2nd Step",
+        "type": "equirectangular",
+        "panorama": "images/leftside_nursing_near_stairs.jpg",
+         "hotSpots": [
+            {
+                "pitch": -5,
+                "yaw": 180,
+                "type": "scene",
+                "text": "Nursing 1st Floor Hallway",
+                "sceneId": "nursing_entrance"
+          
+           
+          }
+        ]
     }
 };
 
