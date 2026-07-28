@@ -150,6 +150,7 @@ function startCompass() {
 
       document.title = heading.toFixed(0);
       
+      
       if (NAV_ACTIVE && userLocation) {
         updateStepsLive(userLocation);
     }
@@ -167,6 +168,7 @@ function relativeAngle(current, target) {
     return diff;
 }
 
+//compass helper
 function headingInstruction(diff) {
 
     if (Math.abs(diff) < 15)

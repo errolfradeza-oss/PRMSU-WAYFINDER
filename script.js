@@ -1,23 +1,22 @@
 let map;
-let userLocation = null;// Actual GPS location
+let userLocation = null;
 let activeRoute = null;
 let campusBounds = null;
-let CAMPUS_GRAPH = new Map();// Graph for shortest path
-let markers = [];// for cleanup
+let CAMPUS_GRAPH = new Map();// shortest path graph 
+let markers = [];// cleanup
 let currentDept = null;
 const HOVER_IMAGE_CACHE = new Map();
 
-const SNAP_DISTANCE = 6;// meters (connect nearby route points)
-const GATE_SNAP_MAX_METERS = 99999999; // snap to gate only if within this range (adjust)
+const SNAP_DISTANCE = 6;// route snap(m) adjust nlng pg ayaw
+const GATE_SNAP_MAX_METERS = 99999999; // snap to gatepoints(front n back)
 
-/* ===== Gates ===== */
 const GATES = {
   frontGate: { lat: 15.3218841, lng: 119.9852327 },
   backGate: { lat: 15.3166213, lng: 119.9833767 },
   //prmsuArc: { lat: 15.3218841, lng: 119.9852327 }
 };
 
-/* ===== Graph Utilities ===== */
+// graph util
 function coordKey(pt) {
   return `${pt.lat},${pt.lng}`;
 }
@@ -104,7 +103,7 @@ function connectClosestComponentsWithPenalty(compA, compB, penaltyMultiplier = 4
 }
 
 
-/* ===== Gate-only snap ===== */
+// snap to gate only
 function getNearestGate(loc) {
   const gates = [GATES.frontGate, GATES.backGate];
 
@@ -126,7 +125,7 @@ function snapUserToGateOnly(loc) {
   const dist = distanceMeters(loc, gate);
 
   return {
-    snapped: gate,     // ✅ start point is literally the gate
+    snapped: gate,
     didSnap: true,
     gate,
     dist
@@ -135,7 +134,7 @@ function snapUserToGateOnly(loc) {
 
 
 
-/* ===== Path Simplify (safe) ===== */
+// simplified path
 function simplifyPath(path, tolerance = 1.5) {
   if (!path || path.length < 3) return path || [];
 
@@ -159,7 +158,7 @@ function simplifyPath(path, tolerance = 1.5) {
   return simplified;
 }
 
-/* ===== Build Graph ===== */
+// build graph
 function buildCampusGraph() {
   CAMPUS_GRAPH.clear();
 
@@ -174,7 +173,7 @@ function buildCampusGraph() {
     allPoints.push(route[route.length - 1]);
   });
 
-  // auto-connect nearby points
+  // nearby points snap
   for (let i = 0; i < allPoints.length; i++) {
     for (let j = i + 1; j < allPoints.length; j++) {
       if (distanceMeters(allPoints[i], allPoints[j]) <= SNAP_DISTANCE) {
@@ -183,13 +182,13 @@ function buildCampusGraph() {
     }
   }
 
-  // but make bridges "expensive" so the route stays rational.
+  // di pa nagagamit pero bka magamit ntin eventually for smart re-routing
   const BRIDGE_PENALTY = 6; // tune 2–6 (higher = less likely to use bridges)
 
   let comps = getConnectedComponents(CAMPUS_GRAPH);
 
   while (comps.length > 1) {
-    // Connect component 0 to the closest other component (component 1)
+    // connect points from different components with penalty
     connectClosestComponentsWithPenalty(comps[0], comps[1], BRIDGE_PENALTY);
     comps = getConnectedComponents(CAMPUS_GRAPH);
   }
@@ -248,7 +247,7 @@ function keyToPoint(key) {
   return { lat, lng };
 }
 
-/* =====  (Dijkstra) ===== */
+// dijkstra algo 
 function shortestPath(graph, startKey, endKey) {
   const dist = {};
   const prev = {};
@@ -287,7 +286,7 @@ function shortestPath(graph, startKey, endKey) {
   return path;
 }
 
-/* ===== Snap to route points ===== */
+// snap nearest route point
 function getNearestRoutePoint(loc) {
   let nearest = null;
   let minDist = Infinity;
@@ -305,7 +304,7 @@ function getNearestRoutePoint(loc) {
   return nearest;
 }
 
-/* ===== Route Drawing ===== */
+// draw route
 let dashAnimTimer = null;
 
 function drawArrowRoute(pathCoords) {
@@ -314,7 +313,7 @@ function drawArrowRoute(pathCoords) {
 
   const arrowSymbol = {
     path: google.maps.SymbolPath.CIRCLE,
-    scale: 3,                 // size of arrow
+    scale: 3,
     strokeColor: "#4169E1",   // gold
     strokeWeight: 5,
     fillColor: "#4169E1",
@@ -337,7 +336,7 @@ function drawArrowRoute(pathCoords) {
 
   window.routeLine.setMap(map);
 
-  //Smooth + slow animation
+  //adjust animation pg d smooth
   let offset = 0;
   const step = 0.2;
   const frame = 12;
@@ -366,14 +365,14 @@ function drawCampusRoute(path) {
   drawArrowRoute(coords);
   activeRoute = window.routeLine;
 
-  // Keep your auto-zoom logic
+  // auto zoom logic
   const bounds = new google.maps.LatLngBounds();
   coords.forEach(pt => bounds.extend(pt));
   map.fitBounds(bounds);
 }
 
 //changed for smart reroute
-/* ===== Directions: GATE-only snap origin ===== */
+// gate only snap
 function getDirectionsToDept(dept) { 
   if (!userLocation) {
     alert("User location not detected");
@@ -384,23 +383,23 @@ function getDirectionsToDept(dept) {
   const toInput = document.getElementById("toInput");
   if (toInput) toInput.value = dept.title;
 
-  // ✅ 1) Start from user (snap to nearest route point)
+  // snap user to nearest route point
   let startPt = getNearestRoutePoint(userLocation);
 
-  // ✅ 2) If user is too far from any route, fallback to nearest gate
+  // pg malayo user, snap to nearest gate (front/back)
   const distToRoute = startPt ? distanceMeters(userLocation, startPt) : Infinity;
 
-  let routingOrigin = userLocation; // default: real GPS
+  let routingOrigin = userLocation; // default gps
 
   if (distToRoute > 35) {
     const { snapped: gatePoint } = snapUserToGateOnly(userLocation);
-    routingOrigin = gatePoint; // ✅ ONLY for routing
+    routingOrigin = gatePoint; // only for route
   }
 
-  // ✅ Snap the ROUTING origin to a route node
+  // snap the route origin to a route node
   startPt = getNearestRoutePoint(routingOrigin);
 
-  // ✅ Keep marker always following real GPS (create if missing)
+  // keep marker always following real gps (create if missing)
   if (!window.userMarker) {
     window.userMarker = new google.maps.Marker({
       position: userLocation,
@@ -412,7 +411,7 @@ function getDirectionsToDept(dept) {
     window.userMarker.setPosition(userLocation);
   }
 
-  // ✅ End node = nearest route point to destination
+  // End node = nearest route point to destination
   const endPt = getNearestRoutePoint(dept.position);
 
   if (!startPt || !endPt) {
@@ -469,7 +468,7 @@ function preloadHoverImages() {
   });
 }
 
-/* ===== Initialize Map ===== */
+// map initialization po ate
 function initMap() {
   campusBounds = new google.maps.LatLngBounds(
     { lat: 15.3163, lng: 119.9812 },
@@ -518,22 +517,22 @@ google.maps.event.addListenerOnce(map, "idle", () => {
   updateOffscreenArrow();
 });
 
-// Fit the campus bounds (this sets the correct "max zoom-out")
+// fit the campus bounds
 map.fitBounds(campusBounds);
 map.setTilt(45);
 
 //zoom slider setup
 const zoomSlider = document.getElementById("zoomSlider");
 
-// Slider is PERCENT, not zoom
+// slider is PERCENT, not zoom
 zoomSlider.min = 0;
 zoomSlider.max = 100;
 zoomSlider.step = 0.1;
 
-let MIN_ZOOM;                 // will be computed from fitBounds
+let MIN_ZOOM; // will be computed from fitBounds
 const MAX_ZOOM = DESIRED_MAX_ZOOM;
 
-// --- helper ---
+// helpers
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 
 function zoomToPct(z) {
@@ -679,9 +678,9 @@ marker.addListener("click", () => {
 }
 
 //fixed for smart reroute
-/* ===== Draw Campus Paths ===== */
+//campus path polylines po ate
 function drawCampusPaths() {
-  // draw each route (ADDITIONAL_ROUTES is array of arrays)
+  // draw each route
   ADDITIONAL_ROUTES.forEach(route => {
     new google.maps.Polyline({
       path: route,
@@ -693,7 +692,7 @@ function drawCampusPaths() {
   });
 }
 
-/* ===== Get User Location ===== */
+// get userloc
 let hasAutoCentered = false;
 
 function getUserLocation() {
@@ -745,21 +744,20 @@ function getUserLocation() {
         //window.userGlow.setRadius(pos.coords.accuracy);
       }
 
-      // Optional GPS debug text
       const debug = document.getElementById("debugGPS");
       if (debug) {
         debug.textContent =
           `Lat: ${userLocation.lat.toFixed(6)}\nLng: ${userLocation.lng.toFixed(6)}`;
       }
 
-      // Show current location in FROM input
+      // user loc from input
       const fromInput = document.getElementById("fromInput");
       if (fromInput) {
         fromInput.value = "Current location";
         fromInput.readOnly = true;
       }
 
-      // Create marker once, then update
+      // marker
       if (!window.userMarker) {
         window.userMarker = new google.maps.Marker({
           position: userLocation,
@@ -808,7 +806,7 @@ if (!userLocation) {
         return;
     }
 
-    // Buildings that have restrooms
+    // buildings that have restrooms
     const restroomBuildings = locations.filter(loc =>
         loc.facilities &&
         loc.facilities.includes("restroom")
@@ -819,9 +817,7 @@ if (!userLocation) {
         return;
     }
 
-    // -----------------------------
-    // Determine routing origin
-    // -----------------------------
+    // determine route origin
     let routingOrigin = userLocation;
 
     let startPt = getNearestRoutePoint(userLocation);
@@ -829,7 +825,7 @@ if (!userLocation) {
         ? distanceMeters(userLocation, startPt)
         : Infinity;
 
-    // If user is outside campus, begin from nearest gate
+    // if user is outside campus, begin from nearest gate
     if (distToRoute > 35) {
         const { snapped } = snapUserToGateOnly(userLocation);
         routingOrigin = snapped;
@@ -842,9 +838,7 @@ if (!userLocation) {
         return;
     }
 
-    // -----------------------------
-    // Find restroom with shortest WALKING distance
-    // -----------------------------
+    // find nearest restroom by walking distance
     let nearest = null;
     let shortestDistance = Infinity;
 
@@ -899,7 +893,7 @@ function getUserLocationPrompt() {
   setupLocationPrePrompt();
 }
 
-/* ===== Sliding Menu & Tabs (unchanged) ===== */
+// sliding menu n tabs
 function toggleSideMenu(){
   const menu = document.getElementById("sideMenu");
   const open = menu.classList.toggle("open");
@@ -969,7 +963,7 @@ function openTab(tabName) {
   if (btn) btn.classList.add("active");
 }
 
-/* ===== Department Panel Drag (unchanged) ===== */
+// department panel drag
 const deptPanel = document.getElementById("deptPanel");
 const handle = deptPanel.querySelector(".panel-handle");
 let isDragging = false, startY, startBottom;
@@ -1119,7 +1113,6 @@ function setupSearchPanel(map, locations) {
 
   const pill = input.closest(".gm-pill");
   const topbar = document.querySelector(".topbar");
-    /* FIX: keep taps inside search pill from bubbling to document/map */
   pill?.addEventListener("click", (e) => e.stopPropagation());
   pill?.addEventListener("touchstart", (e) => e.stopPropagation(), { passive: true });
 
@@ -1203,7 +1196,6 @@ function setupSearchPanel(map, locations) {
     }
 
     //added
-    /* FIX: tapping the input on mobile should keep search open */
   input.addEventListener("touchstart", (e) => {
     e.stopPropagation();
     if (isMobile()) topbar.classList.add("expanded");
@@ -1239,7 +1231,6 @@ function setupSearchPanel(map, locations) {
     input.focus();
   });
 
-  /* FIX: use one shared handler for both click and touch on mobile */
 function handleSearchToggle(e) {
   e.preventDefault();
   e.stopPropagation();
