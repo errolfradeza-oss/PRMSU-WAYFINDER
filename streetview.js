@@ -63,7 +63,17 @@ const scenes = {
     "ccit_step5": {
         "title": "CCIT 1st Floor - Step 4",
         "type": "equirectangular",
-        "panorama": "images/PANO_20260123_142712.jpg"},
+        "panorama": "images/PANO_20260123_142712.jpg",
+        "hotSpots": [
+            {
+                "pitch": -5,
+                "yaw": 180,
+                "type": "scene",
+                "text": "CCIT 1st Floor Hallway",
+                "sceneId": "ccit_step3"}
+            ]
+            },
+
 
     "ccit_step4": {
         "title": "CCIT 1st Floor - Step 4",
