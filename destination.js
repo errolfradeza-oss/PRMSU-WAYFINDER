@@ -323,3 +323,5 @@ function updateStepsLive(userLoc) {
   LIVE_STEPS = updated;
   renderDirectionsSteps(updated);
 }
+
+//comment testing hahaha
