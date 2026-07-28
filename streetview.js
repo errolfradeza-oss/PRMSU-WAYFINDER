@@ -110,7 +110,7 @@ const scenes = {
                 "yaw": 180,
                 "type": "scene",
                 "text": "Nursing 1st Floor Hallway",
-                "sceneId": "nursing_2nd_step"
+                "sceneId": "nursing_entrance"
           
            
           }
