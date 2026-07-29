@@ -175,6 +175,7 @@ function relativeAngle(current, target) {
 }
 
 //compass helper
+
 /* function relativeToPath(currentHeading, pathBearing) {
 
     let diff = currentHeading - pathBearing;

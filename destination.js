@@ -132,6 +132,32 @@ function renderDirectionsSteps(steps) {
 }
 
 //dto ung update steps
+function getCurrentStep(userLoc, steps) {
+
+    if (!steps.length) return 0;
+
+    // Find the nearest step
+    let nearest = 0;
+    let nearestDist = Infinity;
+
+    for (let i = 0; i < steps.length; i++) {
+
+        const d = distanceMeters(userLoc, steps[i].at);
+
+        if (d < nearestDist) {
+            nearestDist = d;
+            nearest = i;
+        }
+
+    }
+
+    // If already close enough to that step,
+    // advance to the next instruction.
+    if (nearestDist < 8 && nearest < steps.length - 1)
+        return nearest + 1;
+
+    return nearest;
+}
 
 
 function buildTurnByTurn(pathPoints, destinationName = "Destination") {
@@ -284,28 +310,26 @@ function updateStepsLive(userLoc) {
         // ---------------- TURN ----------------
     if (s.type === "turn") {
 
-        const d = distanceMeters(userLoc, s.at);
+      const d = distanceMeters(userLoc, s.at);
 
-        //new added
-        const nearest = getNearestSegment(
-            window.CURRENT_ROUTE,
-            userLoc
-        );
+      const pathBearing =
+          d > 8
+              ? s.approachBearing
+              : s.exitBearing;
 
-        if (!nearest) return s;
+      const diff =
+          relativeAngle(
+              currentHeading,
+              pathBearing
+          );
 
-        const diff = relativeAngle(
-            currentHeading,
-            nearest.bearing
-        );
-
-        return {
-            ...s,
-            text:
-    `${headingInstruction(diff)}
-    ${formatDistance(d)}`
-        };
-    }
+      return {
+          ...s,
+          text:
+  `${headingInstruction(diff)}
+  ${formatDistance(d)}`
+      };
+  }
 
         // ---------------- CONTINUE ----------------
           if (s.type === "continue") {
