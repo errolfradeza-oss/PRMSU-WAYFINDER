@@ -112,6 +112,9 @@ function liveRerouteIfNeeded() {
   const path = shortestPath(CAMPUS_GRAPH, coordKey(startPt), coordKey(endPt));
   if (!path || path.length < 2) return;
 
+  //optional po
+  window.CURRENT_ROUTE = path;
+
   drawCampusRoute(path);
 
   LIVE_STEPS = buildTurnByTurn(path, NAV_DEST.title);
@@ -169,25 +172,36 @@ function relativeAngle(current, target) {
 }
 
 //compass helper
+function relativeToPath(currentHeading, pathBearing) {
+
+    let diff = currentHeading - pathBearing;
+
+    while (diff > 180) diff -= 360;
+    while (diff < -180) diff += 360;
+
+    return diff;
+}
+
+//compass helper
 function headingInstruction(diff) {
 
     if (Math.abs(diff) < 15)
         return "⬆ Walk Forward";
 
-    if (diff >= 15 && diff < 45)
-        return "↗ Slight Right";
+    if (diff > 15 && diff < 45)
+        return "↖ Slight Left";
 
     if (diff >= 45 && diff < 120)
-        return "➡ Turn Right";
+        return "⬅ Turn Left";
 
     if (diff >= 120)
         return "↩ Turn Around";
 
-    if (diff <= -15 && diff > -45)
-        return "↖ Slight Left";
+    if (diff < -15 && diff > -45)
+        return "↗ Slight Right";
 
     if (diff <= -45 && diff > -120)
-        return "⬅ Turn Left";
+        return "➡ Turn Right";
 
     return "↩ Turn Around";
 }

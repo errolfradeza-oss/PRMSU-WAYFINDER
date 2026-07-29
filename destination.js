@@ -120,6 +120,14 @@ function buildTurnByTurn(pathPoints, destinationName = "Destination") {
   function pushContinue(endIndex) {
     if (accumDist >= MIN_STEP_DIST_M) {
       const ll = toLL(pathPoints[endIndex]);
+
+      const segmentBearing =
+        (
+            google.maps.geometry.spherical.computeHeading(
+                toLL(pathPoints[continueStartIndex]),
+                toLL(pathPoints[endIndex])
+            ) + 360
+        ) % 360;
       steps.push({
         type: "continue",
         text: `Continue for ${formatDistance(accumDist)}`,
@@ -127,6 +135,7 @@ function buildTurnByTurn(pathPoints, destinationName = "Destination") {
         atIndex: endIndex,
         at: { lat: ll.lat(), lng: ll.lng() },
         // used for live distance update (distance from user to this endIndex)
+        segmentBearing,
         continueStartIndex
       });
     }
@@ -237,56 +246,45 @@ function updateStepsLive(userLoc) {
     if (index === currentStep) {
 
         // ---------------- TURN ----------------
-        if (s.type === "turn") {
+    if (s.type === "turn") {
 
-            const d = distanceMeters(userLoc, s.at);
+        const d = distanceMeters(userLoc, s.at);
 
-            const targetBearing =
-                d > 8 ? s.approachBearing : s.exitBearing;
+        const pathBearing =
+            d > 8
+                ? s.approachBearing
+                : s.exitBearing;
 
-            const diff = relativeAngle(currentHeading, targetBearing);
+        const diff = relativeToPath(
+            currentHeading,
+            pathBearing
+        );
 
-            return {
-                ...s,
-                text:
+        return {
+            ...s,
+            text:
     `${headingInstruction(diff)}
     ${formatDistance(d)}`
-            };
-        }
+        };
+    }
 
         // ---------------- CONTINUE ----------------
-        if (s.type === "continue") {
+          if (s.type === "continue") {
 
-            const d = distanceMeters(userLoc, s.at);
+          const d = distanceMeters(userLoc, s.at);
 
-            const next = LIVE_STEPS[index + 1];
+          const diff = relativeToPath(
+              currentHeading,
+              s.segmentBearing
+          );
 
-            if (next && next.at) {
-
-                const targetBearing =
-                    google.maps.geometry.spherical.computeHeading(
-                        new google.maps.LatLng(userLoc.lat, userLoc.lng),
-                        new google.maps.LatLng(next.at.lat, next.at.lng)
-                    );
-
-                const diff = relativeAngle(
-                    currentHeading,
-                    (targetBearing + 360) % 360
-                );
-
-                return {
-                    ...s,
-                    text:
-    `${headingInstruction(diff)}
-    ${formatDistance(d)}`
-                };
-            }
-
-            return {
-                ...s,
-                text: `${formatDistance(d)}`
-            };
-        }
+          return {
+              ...s,
+              text:
+      `${headingInstruction(diff)}
+      ${formatDistance(d)}`
+          };
+      }
     }
 
     // ---------------- ARRIVE ----------------
