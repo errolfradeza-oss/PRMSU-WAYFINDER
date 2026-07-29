@@ -70,9 +70,11 @@ const scenes = {
                 "yaw": 180,
                 "type": "scene",
                 "text": "CCIT 1st Floor Hallway",
-                "sceneId": "ccit_step3"}
-            ]
-            },
+                "sceneId": "ccit_step3",
+                "targetYaw": 180
+            }
+        ]
+    },
 
 
     "ccit_step4": {
@@ -92,7 +94,8 @@ const scenes = {
                 "yaw": 1,
                 "type": "scene",
                 "text": "nursing",
-                "sceneId": "nursing_entrance"
+                "sceneId": "nursing_entrance",
+                "targetYaw": 180
             }
             
             
