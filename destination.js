@@ -10,7 +10,51 @@ function formatDistance(meters) {
 }
 
 //helper function for compass
-function getCurrentStep(userLoc, steps) {
+function getNearestSegment(route, userLoc) {
+
+    if (!route || route.length < 2) return null;
+
+    let best = null;
+    let bestDist = Infinity;
+
+    const userLL = new google.maps.LatLng(userLoc.lat, userLoc.lng);
+
+    for (let i = 0; i < route.length - 1; i++) {
+
+        const A = new google.maps.LatLng(route[i].lat, route[i].lng);
+        const B = new google.maps.LatLng(route[i + 1].lat, route[i + 1].lng);
+
+        const dist = distancePointToSegmentMeters(
+            userLoc,
+            route[i],
+            route[i + 1]
+        );
+
+        if (dist < bestDist) {
+
+            bestDist = dist;
+
+            best = {
+
+                index: i,
+
+                bearing:
+                    (
+                        google.maps.geometry.spherical.computeHeading(A, B)
+                        + 360
+                    ) % 360
+
+            };
+
+        }
+
+    }
+
+    return best;
+
+}
+
+/* function getCurrentStep(userLoc, steps) {
 
     for (let i = 0; i < steps.length; i++) {
 
@@ -23,7 +67,8 @@ function getCurrentStep(userLoc, steps) {
     }
 
     return steps.length - 1;
-}
+} */
+
 
 //main code for destination page
 
@@ -120,14 +165,6 @@ function buildTurnByTurn(pathPoints, destinationName = "Destination") {
   function pushContinue(endIndex) {
     if (accumDist >= MIN_STEP_DIST_M) {
       const ll = toLL(pathPoints[endIndex]);
-
-      const segmentBearing =
-        (
-            google.maps.geometry.spherical.computeHeading(
-                toLL(pathPoints[continueStartIndex]),
-                toLL(pathPoints[endIndex])
-            ) + 360
-        ) % 360;
       steps.push({
         type: "continue",
         text: `Continue for ${formatDistance(accumDist)}`,
@@ -135,7 +172,6 @@ function buildTurnByTurn(pathPoints, destinationName = "Destination") {
         atIndex: endIndex,
         at: { lat: ll.lat(), lng: ll.lng() },
         // used for live distance update (distance from user to this endIndex)
-        segmentBearing,
         continueStartIndex
       });
     }
@@ -250,14 +286,17 @@ function updateStepsLive(userLoc) {
 
         const d = distanceMeters(userLoc, s.at);
 
-        const pathBearing =
-            d > 8
-                ? s.approachBearing
-                : s.exitBearing;
+        //new added
+        const nearest = getNearestSegment(
+            window.CURRENT_ROUTE,
+            userLoc
+        );
 
-        const diff = relativeToPath(
+        if (!nearest) return s;
+
+        const diff = relativeAngle(
             currentHeading,
-            pathBearing
+            nearest.bearing
         );
 
         return {
@@ -273,9 +312,16 @@ function updateStepsLive(userLoc) {
 
           const d = distanceMeters(userLoc, s.at);
 
-          const diff = relativeToPath(
+          const nearest = getNearestSegment(
+              window.CURRENT_ROUTE,
+              userLoc
+          );
+
+          if (!nearest) return s;
+
+          const diff = relativeAngle(
               currentHeading,
-              s.segmentBearing
+              nearest.bearing
           );
 
           return {
