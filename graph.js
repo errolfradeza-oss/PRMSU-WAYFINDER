@@ -1547,7 +1547,7 @@ function renderAbout(dept) {
     return;
   }
 
-  // Intro
+  // ano to tangina
   if (dept.about.intro) {
     aboutContainer.innerHTML += `
       <div class="about-intro">
