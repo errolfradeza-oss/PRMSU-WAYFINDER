@@ -210,8 +210,8 @@ function buildTurnByTurn(pathPoints, destinationName = "Destination") {
     const ll0 = toLL(pathPoints[0]);
     steps.push({
       type: "start",
-      text: "Start Navigation",
-      baseText: "Start Navigation",
+      text: "Walk towards the highlighted path to begin navigation",
+      baseText: "Walk towards the highlighted path to begin navigation",
       atIndex: 0,
       at: { lat: ll0.lat(), lng: ll0.lng() }
     });
