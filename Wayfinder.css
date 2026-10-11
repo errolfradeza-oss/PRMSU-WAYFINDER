@@ -1093,3 +1093,97 @@ body.menu-open.dir-open #sideMenu .menu-strip { z-index: 1000; }
 .hidden{
   display: none !important;
 }
+
+/* Buildings menu */
+/* ===== BUILDINGS DROPDOWN ===== */
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  margin-top: 5px;
+
+  background: #e8eaf6;
+  color: #202d80;
+
+  border: none;
+  border-radius: 7px;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.menu-item:hover {
+  background: #d9def2;
+  color: #17246f;
+}
+
+.menu-item span:last-child {
+  font-size: 12px;
+  color: #202d80;
+}
+
+/* Dropdown list container */
+.side-submenu {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+
+  padding: 7px 0 5px 12px;
+  margin: 0;
+}
+
+.side-submenu.show {
+  display: flex;
+}
+
+/* Individual building buttons */
+.side-submenu button {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 11px 12px;
+  margin: 0;
+
+  background: #e8eaf6;
+  color: #202d80;
+
+  border: none;
+  border-radius: 7px;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: left;
+
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease,
+              transform 0.15s ease;
+}
+
+.side-submenu button:hover {
+  background: #d9def2;
+  color: #17246f;
+}
+
+.side-submenu button:active {
+  background: #cbd2ed;
+  transform: scale(0.98);
+}
+
+/* Keyboard accessibility */
+.menu-item:focus-visible,
+.side-submenu button:focus-visible {
+  outline: 2px solid #202d80;
+  outline-offset: 2px;
+}
+

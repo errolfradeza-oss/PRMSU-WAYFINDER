@@ -1638,3 +1638,14 @@ function startMapGpsShare() {
     }
   );
 }
+//New Hamburger Menu Option(Bldg list)
+function toggleBuildings() {
+  const menu = document.getElementById("buildingMenu");
+  const arrow = document.getElementById("buildingArrow");
+
+  menu.classList.toggle("show");
+
+  arrow.textContent = menu.classList.contains("show")
+    ? "▼"
+    : "▶";
+}

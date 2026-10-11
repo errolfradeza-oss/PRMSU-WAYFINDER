@@ -36,6 +36,64 @@
   <button onclick="getUserLocationPrompt()">My Location</button>
   <button onclick="clearRoute()">Clear Route</button>
   <button onclick="nearestComfortRoom()">Nearest Comfort Room</button>
+
+  <div class="menu-item" onclick="toggleBuildings()">
+    <span>Buildings</span>
+    <span id="buildingArrow">▶</span>
+  </div>
+
+  
+  
+  <div class="side-submenu" id="buildingMenu">
+  <button
+    type="button"
+    title="Administration Building"
+    onclick="goToLocation('admin')">
+    Administration
+  </button>
+
+  <button
+    type="button"
+    title="College of Computing and Information Technology"
+    onclick="goToLocation('ccit')">
+    CCIT
+  </button>
+
+  <button
+    type="button"
+    title="College of Arts and Sciences"
+    onclick="goToLocation('cas')">
+    CAS
+  </button>
+
+  <button
+    type="button"
+    title="College of Criminal Justice Education"
+    onclick="goToLocation('ccje')">
+    CCJE
+  </button>
+
+  <button
+    type="button"
+    title="College of Teacher Education"
+    onclick="goToLocation('cte')">
+    CTE
+  </button>
+
+  <button
+    type="button"
+    title="University Library"
+    onclick="goToLocation('library')">
+    Library
+  </button>
+
+  <button
+    type="button"
+    title="University Gymnasium"
+    onclick="goToLocation('gym')">
+    Gym
+  </button>
+</div>
   <!--<button onclick="routeToAdmin()">Go to Admin</button>
 
   <div class="menu-item" onclick="toggleDepartments()">
