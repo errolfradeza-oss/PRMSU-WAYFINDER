@@ -1300,3 +1300,512 @@ body.menu-open.dir-open #sideMenu .menu-strip { z-index: 1000; }
     font-size: 24px;
   }
 }
+
+
+/* =========================================
+   OPTION B - PRMSU WAYFINDER DIRECTIONS
+   Styles only the panel header, From/To and ETA.
+   Does not restyle individual route steps.
+========================================= */
+
+#dirPanel.direction-panel {
+  width: 350px;
+  max-width: calc(100vw - 30px);
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+  background: #ffffff;
+  border-right: 1px solid rgba(0, 29, 71, 0.12);
+  box-shadow: 8px 0 28px rgba(0, 0, 0, 0.20);
+}
+
+#dirPanel .walk-dir {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: #f7f9fc;
+}
+
+/* NAVY HEADER */
+
+#dirPanel .dir-header {
+  position: relative;
+  flex: 0 0 auto;
+  min-height: 88px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 18px 20px;
+  overflow: hidden;
+  background: #001d47;
+  color: #ffffff;
+  border-bottom: 4px solid #ffbd2a;
+}
+
+#dirPanel .dir-header-mark {
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: #ffbd2a;
+  color: #001d47;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+#dirPanel .dir-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+#dirPanel .dir-header-text strong {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 850;
+  letter-spacing: 0.7px;
+  line-height: 1.2;
+}
+
+#dirPanel .dir-header-text span {
+  color: #cbd9ed;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+#dirPanel .dir-header-accent {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  right: -35px;
+  top: -48px;
+  border: 12px solid rgba(255, 189, 42, 0.12);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* FROM / TO CARD */
+
+#dirPanel .walk-inputs {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) 34px;
+  align-items: stretch;
+  gap: 10px;
+  margin: 16px 14px 8px;
+  padding: 14px 12px;
+  background: #ffffff;
+  border: 1px solid #e1e8f1;
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(0, 29, 71, 0.06);
+}
+
+/* Connected start/end markers */
+
+#dirPanel .walk-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 0;
+}
+
+#dirPanel .walk-rail .dot {
+  flex: 0 0 auto;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+#dirPanel .walk-rail .dot.start {
+  background: #001d47;
+  border: 3px solid #dce8f8;
+  box-shadow: 0 0 0 2px #001d47;
+}
+
+#dirPanel .walk-rail .dot.end {
+  background: #ffbd2a;
+  border: 2px solid #001d47;
+}
+
+#dirPanel .walk-rail .line {
+  flex: 0 0 27px;
+  width: 2px;
+  margin: 3px 0;
+  background: #b9c8dc;
+}
+
+/* Stacked input fields */
+
+#dirPanel .walk-fields {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+
+#dirPanel .walk-fields input {
+  width: 100%;
+  min-width: 0;
+  height: 43px;
+  padding: 0 12px;
+  border: 1px solid #e0e7f0;
+  border-radius: 10px;
+  outline: none;
+  background: #f7f9fc;
+  color: #001d47;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+#dirPanel .walk-fields input::placeholder {
+  color: #8290a3;
+  font-weight: 500;
+}
+
+#dirPanel .walk-fields input:focus {
+  border-color: #001d47;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(0, 29, 71, 0.07);
+}
+
+/* Clear-route button */
+
+#dirPanel .walk-swap {
+  align-self: center;
+  justify-self: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #e5eaf1;
+  border-radius: 10px;
+  background: #f2f5f9;
+  color: #001d47;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+#dirPanel .walk-swap:hover {
+  background: #001d47;
+  color: #ffffff;
+}
+
+/* Hide the unused empty Add Destination button */
+
+#dirPanel .walk-add:empty {
+  display: none;
+}
+
+/* ROUTE OPTIONS AREA - no route logic changes */
+
+#dirPanel .walk-routes {
+  flex: 0 0 auto;
+  padding: 0 14px;
+  background: #f7f9fc;
+}
+
+/* COMPACT ETA CARD */
+
+#dirPanel .eta-card {
+  flex: 0 0 auto;
+  margin: 8px 14px 10px;
+  padding: 13px 15px;
+  border: 1px solid rgba(0, 29, 71, 0.12);
+  border-left: 4px solid #ffbd2a;
+  border-radius: 13px;
+  background: #ffffff;
+  color: #001d47;
+  box-shadow: 0 4px 13px rgba(0, 29, 71, 0.06);
+}
+
+#dirPanel .eta-main {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+#dirPanel .eta-time {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+#dirPanel #etaMinutes {
+  color: #001d47;
+  font-size: 24px;
+  font-weight: 850;
+  line-height: 1.15;
+}
+
+#dirPanel #etaStatus {
+  color: #748197;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Keep arrival ID in the HTML but simplify the compact layout */
+
+#dirPanel .eta-arrival {
+  display: none;
+}
+
+/* Time and remaining distance */
+
+#dirPanel .eta-distance-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 9px;
+  padding-top: 9px;
+  border-top: 1px solid #edf1f6;
+}
+
+#dirPanel .eta-distance-row span {
+  color: #748197;
+  font-size: 11px;
+}
+
+#dirPanel .eta-distance-row strong {
+  color: #001d47;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+/* Keep progress elements and IDs intact, but hide them
+   for Option B's compact ETA appearance */
+
+#dirPanel .eta-progress-track,
+#dirPanel .eta-progress-label {
+  display: none;
+}
+
+/* Keep the existing sliding handle visible */
+
+#dirPanel .dir-strip {
+  background: #001d47;
+  color: #ffbd2a;
+  border: 1px solid rgba(255, 189, 42, 0.35);
+  border-left: 0;
+  border-radius: 0 8px 8px 0;
+}
+
+/* Smaller screens */
+
+@media (max-width: 768px) {
+  #dirPanel.direction-panel {
+    width: min(350px, calc(100vw - 30px));
+    max-width: calc(100vw - 30px);
+  }
+
+  #dirPanel .dir-header {
+    min-height: 78px;
+    padding: 14px 16px;
+  }
+
+  #dirPanel .walk-inputs {
+    margin: 12px 10px 6px;
+    padding: 12px 9px;
+    grid-template-columns: 16px minmax(0, 1fr) 32px;
+    gap: 8px;
+  }
+
+  #dirPanel .walk-fields input {
+    height: 41px;
+    font-size: 12px;
+  }
+
+  #dirPanel .eta-card {
+    margin: 7px 10px 8px;
+    padding: 11px 12px;
+  }
+}
+
+/* FIX: Keep the slide-out handle visible */
+#dirPanel.direction-panel {
+  overflow: visible !important;
+}
+
+#dirPanel .walk-dir {
+  overflow: hidden;
+}
+
+#dirPanel .dir-strip {
+  position: absolute;
+  top: 85px;
+  right: -30px;
+  width: 30px;
+  height: 60px;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: #001d47;
+  color: #ffbd2a;
+  border-radius: 0 10px 10px 0;
+  box-shadow: 3px 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+#dirPanel .dir-strip {
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+#dirPanel .dir-strip:hover {
+  background: #082b5c;
+  color: #ffffff;
+}
+
+
+/*test*/
+
+/* =========================
+   PRMSU WAYFINDER SIDE MENU
+   Matching Direction Panel
+   ========================= */
+
+.side-menu {
+  position: fixed;
+  top: 100px;
+  left: -250px;
+  width: 250px;
+  height: calc(100vh - 100px);
+
+  background: #ffffff;
+  color: #001d47;
+
+  border-right: 1px solid rgba(0, 29, 71, 0.08);
+  box-shadow: 3px 0 20px rgba(0, 0, 0, 0.18);
+
+  padding: 20px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  transition: left 0.35s ease;
+  z-index: 900;
+}
+
+.side-menu.open {
+  left: 0;
+  z-index: 1300;
+}
+
+/* SLIDE-OUT HANDLE */
+.menu-strip {
+  position: absolute;
+  top: 20px;
+  right: -30px;
+
+  width: 30px;
+  height: 60px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #001d47;
+  color: #ffbd2a;
+
+  font-weight: 800;
+  border: 1px solid rgba(255, 189, 42, 0.35);
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+
+  cursor: pointer;
+  box-shadow: 3px 2px 10px rgba(0, 29, 71, 0.18);
+  z-index: 1000;
+
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.menu-strip:hover {
+  background: #082b5c;
+  color: #ffffff;
+}
+
+/* MENU BUTTONS */
+.side-menu button {
+  width: 100%;
+  padding: 12px 14px;
+
+  background: #ffffff;
+  color: #001d47;
+
+  border: 1px solid #e5eaf0;
+  border-left: 3px solid transparent;
+  border-radius: 10px;
+
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.side-menu button:hover {
+  background: #fff8e7;
+  border-color: #ffbd2a;
+  border-left-color: #ffbd2a;
+}
+
+.side-menu button:active {
+  transform: scale(0.98);
+}
+
+/* SUBMENU */
+.side-submenu {
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  margin-left: 10px;
+  padding-left: 10px;
+  border-left: 2px solid #ffbd2a;
+}
+
+.side-submenu.open {
+  display: flex;
+}
+
+/* SUBMENU BUTTONS */
+.side-submenu button {
+  padding: 10px 12px;
+  background: #f8fafc;
+  color: #001d47;
+  border: 1px solid #e5eaf0;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.side-submenu button:hover {
+  background: #fff3d1;
+  border-color: #ffbd2a;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .side-menu {
+    width: min(280px, 82vw);
+    left: calc(-1 * min(280px, 82vw));
+    padding: 16px 12px;
+  }
+}
+
+
