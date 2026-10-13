@@ -388,8 +388,113 @@ function updateStepsLive(userLoc) {
     return s;
   });
 
+  
   LIVE_STEPS = updated;
   renderDirectionsSteps(updated);
+
+  // Update the live walking ETA.
+  if (typeof updateWalkingETA === "function") {
+    updateWalkingETA(userLoc);
+  }
 }
 
-//comment testing hahahaha
+//ETA comp
+
+function updateWalkingETA(userLoc) {
+  const card = document.getElementById("etaCard");
+  const minutesEl = document.getElementById("etaMinutes");
+  const arrivalEl = document.getElementById("etaArrival");
+  const distanceEl = document.getElementById("etaDistance");
+  const progressEl = document.getElementById("etaProgress");
+  const progressTextEl = document.getElementById("etaProgressText");
+  const statusEl = document.getElementById("etaStatus");
+  const progressTrack = document.querySelector(".eta-progress-track");
+
+  if (!card) return;
+
+  // Show ETA only while live navigation is active.
+  if (
+    typeof NAV_ACTIVE === "undefined" ||
+    !NAV_ACTIVE ||
+    !userLoc ||
+    !window.CURRENT_ROUTE ||
+    window.CURRENT_ROUTE.length < 2
+  ) {
+    card.classList.add("hidden");
+    return;
+  }
+
+  const route = window.CURRENT_ROUTE;
+  const destination = route[route.length - 1];
+
+  // Find the nearest route point to the user's location.
+  let nearestIndex = 0;
+  let nearestDistance = Infinity;
+
+  for (let i = 0; i < route.length; i++) {
+    const point = route[i];
+    const distance = distanceMeters(userLoc, point);
+
+    if (distance < nearestDistance) {
+      nearestDistance = distance;
+      nearestIndex = i;
+    }
+  }
+
+  // Calculate remaining walking distance along the route.
+  let remainingMeters = nearestDistance;
+
+  for (let i = nearestIndex; i < route.length - 1; i++) {
+    remainingMeters += distanceMeters(route[i], route[i + 1]);
+  }
+
+  // Avoid showing misleading estimates if the location is far from the route.
+  if (nearestDistance > 100) {
+    statusEl.textContent = "Reconnecting to route";
+    card.classList.remove("hidden");
+    return;
+  }
+
+  const WALKING_SPEED = 1.25; // meters per second
+  const remainingSeconds = remainingMeters / WALKING_SPEED;
+  const remainingMinutes = Math.ceil(remainingSeconds / 60);
+  const arrival = new Date(Date.now() + remainingSeconds * 1000);
+
+  // Calculate route progress.
+  let totalMeters = 0;
+
+  for (let i = 0; i < route.length - 1; i++) {
+    totalMeters += distanceMeters(route[i], route[i + 1]);
+  }
+
+  const progress = totalMeters > 0
+    ? Math.max(0, Math.min(100,
+        ((totalMeters - remainingMeters) / totalMeters) * 100))
+    : 0;
+
+  minutesEl.textContent = remainingMinutes <= 1
+    ? "1 min"
+    : `${remainingMinutes} min`;
+
+  arrivalEl.textContent = arrival.toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit"
+  });
+
+  distanceEl.textContent = remainingMeters >= 1000
+    ? `${(remainingMeters / 1000).toFixed(2)} km`
+    : `${Math.round(remainingMeters)} m`;
+
+  progressEl.style.width = `${progress}%`;
+  progressTextEl.textContent = `${Math.round(progress)}%`;
+
+  if (progressTrack) {
+    progressTrack.setAttribute("aria-valuenow", String(Math.round(progress)));
+  }
+
+  statusEl.textContent = remainingMeters < 10
+    ? "Almost there"
+    : "Walking to destination";
+
+  card.classList.remove("hidden");
+}

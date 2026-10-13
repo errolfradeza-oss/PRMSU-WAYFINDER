@@ -1187,3 +1187,116 @@ body.menu-open.dir-open #sideMenu .menu-strip { z-index: 1000; }
   outline-offset: 2px;
 }
 
+/* =========================
+   LIVE WALKING ETA CARD
+   ========================= */
+
+.eta-card {
+  flex: 0 0 auto;
+  margin: 10px 0 4px;
+  padding: 16px;
+  border: 1px solid rgba(0, 29, 71, 0.12);
+  border-radius: 16px;
+  background: #ffffff;
+  color: #001d47;
+  box-shadow: 0 4px 14px rgba(0, 29, 71, 0.08);
+  font-family: "Poppins", system-ui, sans-serif;
+}
+
+.eta-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.eta-time {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#etaMinutes {
+  font-size: 27px;
+  line-height: 1.2;
+  font-weight: 800;
+  color: #001d47;
+}
+
+#etaStatus {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.eta-arrival {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.eta-arrival span,
+.eta-distance-row span,
+.eta-progress-label span {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.eta-arrival strong {
+  font-size: 17px;
+  color: #001d47;
+}
+
+.eta-distance-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.eta-distance-row strong {
+  font-size: 13px;
+  color: #001d47;
+}
+
+.eta-progress-track {
+  width: 100%;
+  height: 7px;
+  margin-top: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e8edf5;
+}
+
+.eta-progress-fill {
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #001d47, #7dd3fc, #ffbd2a);
+  transition: width 0.35s ease;
+}
+
+.eta-progress-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 7px;
+}
+
+.eta-progress-label strong {
+  font-size: 11px;
+  color: #001d47;
+}
+
+@media (max-width: 768px) {
+  .eta-card {
+    margin: 8px 0;
+    padding: 13px;
+  }
+
+  #etaMinutes {
+    font-size: 24px;
+  }
+}

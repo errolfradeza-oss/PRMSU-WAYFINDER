@@ -427,6 +427,9 @@ function getDirectionsToDept(dept) {
 
   drawCampusRoute(path);
 
+    // Save the route so the live ETA can calculate distance and progress.
+  window.CURRENT_ROUTE = path;
+
   closeDeptPanel();
 
   const steps = buildTurnByTurn(
@@ -444,8 +447,13 @@ function getDirectionsToDept(dept) {
     document.body.classList.remove("dir-closing");
   }
 
-  //for smart reroute
+  // For smart rerouting
   startLiveNavigation(dept);
+
+  // Show the initial walking ETA.
+  if (typeof updateWalkingETA === "function") {
+    updateWalkingETA(userLocation);
+  }
 }
 
 let hoverInfoWindow;

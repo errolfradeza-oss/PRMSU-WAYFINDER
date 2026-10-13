@@ -151,6 +151,42 @@
     <!-- ROUTE LIST -->
     <div class="walk-routes" id="walkRoutes"></div>
 
+    <!--ETA-->
+    <div id="etaCard" class="eta-card hidden">
+      <div class="eta-main">
+        <div class="eta-time">
+          <span id="etaMinutes">-- min</span>
+          <span id="etaStatus">Waiting for GPS</span>
+        </div>
+
+        <div class="eta-arrival">
+          <span>Estimated arrival</span>
+          <strong id="etaArrival">--:--</strong>
+        </div>
+      </div>
+
+      <div class="eta-distance-row">
+        <span>Remaining distance</span>
+        <strong id="etaDistance">-- m</strong>
+      </div>
+
+      <div
+        class="eta-progress-track"
+        role="progressbar"
+        aria-label="Walking route progress"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="0"
+      >
+        <div id="etaProgress" class="eta-progress-fill"></div>
+      </div>
+
+      <div class="eta-progress-label">
+        <span>Route progress</span>
+        <strong id="etaProgressText">0%</strong>
+      </div>
+    </div>
+
     <!-- TURN-BY-TURN STEPS (this is what you asked for) -->
     <div class="dir-steps" id="dirSteps"></div>
 
