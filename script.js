@@ -1169,9 +1169,20 @@ function setupSearchPanel(map, locations) {
     panel.innerHTML = "";
     current = [];
 
+    // Move to the selected location
     map.panTo(loc.position);
     map.setZoom(19);
 
+    // Highlight the matching building polygon
+    const building = BUILDINGS.find(
+      b => key(b.title) === key(loc.title)
+    );
+
+    if (building) {
+      glowBuilding(building.title);
+    }
+
+    // Open the existing department callout
     if (loc.marker) {
       google.maps.event.trigger(loc.marker, "click");
     }
