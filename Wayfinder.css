@@ -1808,4 +1808,129 @@ body.menu-open.dir-open #sideMenu .menu-strip { z-index: 1000; }
   }
 }
 
+/* =========================
+   ANIMATED BUILDING SUBMENU
+   ========================= */
+
+#buildingMenu.side-submenu {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    visibility: hidden;
+    pointer-events: none;
+
+    margin: 0 0 0 10px;
+    padding: 0 0 0 10px;
+
+    border-left: 2px solid transparent;
+
+    transform: translateY(-6px);
+
+    transition:
+        max-height 0.35s ease,
+        opacity 0.22s ease,
+        transform 0.25s ease,
+        padding 0.3s ease,
+        margin 0.3s ease,
+        border-color 0.3s ease,
+        visibility 0s linear 0.35s;
+}
+
+/* OPEN STATE: supports both existing .show and .open */
+#buildingMenu.side-submenu.show,
+#buildingMenu.side-submenu.open {
+    max-height: 420px;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding: 7px 0 5px 10px;
+
+    border-left-color: #ffbd2a;
+    transform: translateY(0);
+
+    transition:
+        max-height 0.4s ease,
+        opacity 0.25s ease,
+        transform 0.25s ease,
+        padding 0.3s ease,
+        margin 0.3s ease,
+        border-color 0.3s ease,
+        visibility 0s;
+}
+
+/* DEPARTMENT BUTTONS */
+#buildingMenu button {
+    flex: 0 0 auto;
+    width: 100%;
+    padding: 11px 12px;
+
+    background: #f8fafc;
+    color: #001d47;
+
+    border: 1px solid #e5eaf0;
+    border-radius: 8px;
+
+    font-size: 13px;
+    font-weight: 600;
+    text-align: left;
+
+    opacity: 0;
+    transform: translateX(-8px);
+    pointer-events: none;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.22s ease,
+        opacity 0.22s ease;
+}
+
+/* SHOW BUTTONS */
+#buildingMenu.show button,
+#buildingMenu.open button {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+/* STAGGERED ENTRANCE */
+#buildingMenu button:nth-child(1) { transition-delay: 0.03s; }
+#buildingMenu button:nth-child(2) { transition-delay: 0.06s; }
+#buildingMenu button:nth-child(3) { transition-delay: 0.09s; }
+#buildingMenu button:nth-child(4) { transition-delay: 0.12s; }
+#buildingMenu button:nth-child(5) { transition-delay: 0.15s; }
+#buildingMenu button:nth-child(6) { transition-delay: 0.18s; }
+#buildingMenu button:nth-child(7) { transition-delay: 0.21s; }
+
+/* HOVER */
+#buildingMenu button:hover {
+    background: #fff3d1;
+    color: #001d47;
+    border-color: #ffbd2a;
+    transform: translateX(3px);
+}
+
+/* CLICK */
+#buildingMenu button:active {
+    background: #ffbd2a;
+    transform: scale(0.98);
+}
+
+/* REDUCED MOTION */
+@media (prefers-reduced-motion: reduce) {
+    #buildingMenu,
+    #buildingMenu button {
+        transition: none !important;
+        transition-delay: 0s !important;
+    }
+}
+
 
