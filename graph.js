@@ -1439,6 +1439,56 @@ function glowBuilding(title) {
   animate();
 }
 
+//test dropdown
+// Map menu IDs to the exact titles in BUILDINGS
+const BUILDING_ALIASES = {
+  admin: "President Ramon Magsaysay State University",
+  ccit: "College of Communication and Information Technology",
+  cas: "College of Arts and Sciences",
+  ccje: "College of Criminal Justice Education",
+  cte: "College of Teacher Education",
+  library: "PRMSU E-Library",
+  gym: "PRMSU Gymnasium"
+};
+
+function goToLocation(id) {
+  const title = BUILDING_ALIASES[String(id).toLowerCase()];
+
+  if (!title) {
+    console.warn("Unknown building ID:", id);
+    return;
+  }
+
+  // Find the building using its exact title
+  const building = BUILDINGS.find(
+    b => normTitle(b.title) === normTitle(title)
+  );
+
+  if (!building) {
+    console.warn("Building not found in BUILDINGS:", title);
+    return;
+  }
+
+  // Highlight its polygon
+  glowBuilding(building.title);
+
+  // Center the map on the building's polygon
+  const bounds = new google.maps.LatLngBounds();
+
+  building.parts.forEach(part => {
+    part.forEach(point => bounds.extend(point));
+  });
+
+  map.fitBounds(bounds, 70);
+
+  // Close the building menu if it is open
+  const menu = document.getElementById("buildingMenu");
+  const arrow = document.getElementById("buildingArrow");
+
+  if (menu) menu.classList.remove("show");
+  if (arrow) arrow.textContent = "▶";
+}
+
 function unglowBuilding(title, immediate = false) {
   const key = normTitle(title);
   const entries = BUILDING_POLYGONS[key];
