@@ -430,6 +430,16 @@ function getDirectionsToDept(dept) {
     // Save the route so the live ETA can calculate distance and progress.
   window.CURRENT_ROUTE = path;
 
+  window.ETA_APPROACH_ORIGIN = {
+    lat: userLocation.lat,
+    lng: userLocation.lng
+  };
+
+  window.ETA_GATE_POINT = {
+    lat: routingOrigin.lat,
+    lng: routingOrigin.lng
+  };
+
   closeDeptPanel();
 
   const steps = buildTurnByTurn(

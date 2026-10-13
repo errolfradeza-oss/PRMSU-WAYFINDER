@@ -399,7 +399,6 @@ function updateStepsLive(userLoc) {
 }
 
 //ETA comp
-
 function updateWalkingETA(userLoc) {
   const card = document.getElementById("etaCard");
   const minutesEl = document.getElementById("etaMinutes");
@@ -412,7 +411,6 @@ function updateWalkingETA(userLoc) {
 
   if (!card) return;
 
-  // Show ETA only while live navigation is active.
   if (
     typeof NAV_ACTIVE === "undefined" ||
     !NAV_ACTIVE ||
@@ -425,15 +423,14 @@ function updateWalkingETA(userLoc) {
   }
 
   const route = window.CURRENT_ROUTE;
-  const destination = route[route.length - 1];
+  const WALKING_SPEED = 1.25; // Estimated walking speed in m/s
 
-  // Find the nearest route point to the user's location.
+  // Find the nearest point on the campus route.
   let nearestIndex = 0;
   let nearestDistance = Infinity;
 
   for (let i = 0; i < route.length; i++) {
-    const point = route[i];
-    const distance = distanceMeters(userLoc, point);
+    const distance = distanceMeters(userLoc, route[i]);
 
     if (distance < nearestDistance) {
       nearestDistance = distance;
@@ -441,40 +438,52 @@ function updateWalkingETA(userLoc) {
     }
   }
 
-  // Calculate remaining walking distance along the route.
-  let remainingMeters = nearestDistance;
+  // Calculate remaining distance along the campus route.
+  let routeRemainingMeters = nearestDistance;
 
   for (let i = nearestIndex; i < route.length - 1; i++) {
-    remainingMeters += distanceMeters(route[i], route[i + 1]);
+    routeRemainingMeters += distanceMeters(route[i], route[i + 1]);
   }
 
-  // Avoid showing misleading estimates if the location is far from the route.
-  if (nearestDistance > 100) {
-    statusEl.textContent = "Reconnecting to route";
-    card.classList.remove("hidden");
-    return;
+  // Account for the approach to the campus gate.
+  // Use the CURRENT GPS location so this distance changes as you move.
+  let approachMeters = 0;
+
+  if (window.ETA_GATE_POINT) {
+    approachMeters = distanceMeters(userLoc, window.ETA_GATE_POINT);
   }
 
-  const WALKING_SPEED = 1.25; // meters per second
+  // If the user is already close to the campus route, don't add
+  // a separate gate approach distance.
+  if (nearestDistance <= 35) {
+    approachMeters = 0;
+  }
+
+  const remainingMeters = approachMeters + routeRemainingMeters;
   const remainingSeconds = remainingMeters / WALKING_SPEED;
   const remainingMinutes = Math.ceil(remainingSeconds / 60);
   const arrival = new Date(Date.now() + remainingSeconds * 1000);
 
-  // Calculate route progress.
-  let totalMeters = 0;
+  // Calculate total campus-route length for progress.
+  let totalRouteMeters = 0;
 
   for (let i = 0; i < route.length - 1; i++) {
-    totalMeters += distanceMeters(route[i], route[i + 1]);
+    totalRouteMeters += distanceMeters(route[i], route[i + 1]);
   }
 
-  const progress = totalMeters > 0
-    ? Math.max(0, Math.min(100,
-        ((totalMeters - remainingMeters) / totalMeters) * 100))
+  // Progress is based on the campus route, not the approach to the gate.
+  const progress = totalRouteMeters > 0
+    ? Math.max(
+        0,
+        Math.min(
+          100,
+          ((totalRouteMeters - routeRemainingMeters) / totalRouteMeters) * 100
+        )
+      )
     : 0;
 
-  minutesEl.textContent = remainingMinutes <= 1
-    ? "1 min"
-    : `${remainingMinutes} min`;
+  minutesEl.textContent =
+    remainingMinutes <= 1 ? "1 min" : `${remainingMinutes} min`;
 
   arrivalEl.textContent = arrival.toLocaleTimeString([], {
     hour: "numeric",
@@ -489,12 +498,19 @@ function updateWalkingETA(userLoc) {
   progressTextEl.textContent = `${Math.round(progress)}%`;
 
   if (progressTrack) {
-    progressTrack.setAttribute("aria-valuenow", String(Math.round(progress)));
+    progressTrack.setAttribute(
+      "aria-valuenow",
+      String(Math.round(progress))
+    );
   }
 
-  statusEl.textContent = remainingMeters < 10
-    ? "Almost there"
-    : "Walking to destination";
+  if (nearestDistance > 100) {
+    statusEl.textContent = "Estimated via campus gate";
+  } else if (remainingMeters < 10) {
+    statusEl.textContent = "Almost there";
+  } else {
+    statusEl.textContent = "Walking to destination";
+  }
 
   card.classList.remove("hidden");
 }
