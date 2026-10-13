@@ -1452,40 +1452,53 @@ const BUILDING_ALIASES = {
 };
 
 function goToLocation(id) {
-  const title = BUILDING_ALIASES[String(id).toLowerCase()];
+  const BUILDING_ALIASES = {
+    admin: "President Ramon Magsaysay State University",
+    ccit: "College of Communication and Information Technology",
+    cas: "College of Arts and Sciences",
+    ccje: "College of Criminal Justice Education",
+    cte: "College of Teacher Education",
+    library: "PRMSU E-Library",
+    gym: "PRMSU Gymnasium"
+  };
+
+  const title = BUILDING_ALIASES[id.toLowerCase()];
 
   if (!title) {
-    console.warn("Unknown building ID:", id);
+    console.warn("Unknown building:", id);
     return;
   }
 
-  // Find the building using its exact title
   const building = BUILDINGS.find(
     b => normTitle(b.title) === normTitle(title)
   );
 
   if (!building) {
-    console.warn("Building not found in BUILDINGS:", title);
+    console.warn("Building not found:", title);
     return;
   }
 
-  // Highlight its polygon
+  // Stop the previous glow
+  if (activeGlowKey) {
+    unglowBuilding(activeGlowKey, true);
+  }
+
+  // Trigger the selected building's glow
   glowBuilding(building.title);
 
-  // Center the map on the building's polygon
+  // Fit the map to the building
   const bounds = new google.maps.LatLngBounds();
 
   building.parts.forEach(part => {
     part.forEach(point => bounds.extend(point));
   });
 
-  map.fitBounds(bounds, 70);
+  map.fitBounds(bounds, 60);
 
-  // Close the building menu if it is open
-  const menu = document.getElementById("buildingMenu");
+  // Close the dropdown
+  document.getElementById("buildingMenu")?.classList.remove("show");
+
   const arrow = document.getElementById("buildingArrow");
-
-  if (menu) menu.classList.remove("show");
   if (arrow) arrow.textContent = "▶";
 }
 
