@@ -1027,6 +1027,7 @@ function stopDrag() {
 
 function openDeptPanel(dept) {
   currentDept = dept;
+  glowBuilding(dept.title);
 
   console.log("OPENED DEPT:", dept);
   console.log("TITLE:", dept.title);
