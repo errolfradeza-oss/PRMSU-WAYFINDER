@@ -1679,3 +1679,53 @@ function toggleBuildings() {
     ? "▼"
     : "▶";
 }
+
+// Helper to open building overview from the side menu
+function openDeptPanelByName(name) {
+  // Check if locations array exists
+  if (typeof locations === "undefined") {
+    console.error("Error: 'locations' array is undefined!");
+    return;
+  }
+
+  console.log("Searching for building button clicked:", name);
+  console.log("Available locations list:", locations);
+
+  // Search through locations. Try matching title, or check if any property matches.
+  // Exact titles for the side-menu buttons. Substring matching alone made
+  // "Administration" hit "College of Accountancy & Business Administration".
+  const MENU_TITLES = {
+    "administration": "President Ramon Magsaysay State University",
+    "ccit": "College of Communication and Information Technology",
+    "cas": "College of Arts & Science New Building",
+    "cte": "College of Teacher Education",
+    "library": "PRMSU E-Library",
+    "gym": "PRMSU Gymnasium"
+  };
+
+  const searchName = name.trim().toLowerCase();
+  const exactTitle = (MENU_TITLES[searchName] || searchName).toLowerCase();
+  const titleOf = loc => (loc.title || loc.name || "").trim().toLowerCase();
+
+  // 1) exact title match, 2) fall back to substring match
+  let match =
+    locations.find(loc => titleOf(loc) === exactTitle) ||
+    locations.find(loc => titleOf(loc).includes(searchName));
+
+  if (match) {
+    console.log("Found matching building object:", match);
+    closeSideMenu();
+    closeDirectionPanel();
+    
+    if (window.map) {
+      window.map.panTo(match.position);
+      window.map.setZoom(19);
+    }
+    
+    openDeptPanel(match);
+  } else {
+    console.warn("Building location not found in 'locations' array for name:", name);
+  }
+}
+
+window.openDeptPanelByName = openDeptPanelByName;
