@@ -1601,7 +1601,7 @@ body.menu-open.dir-open #sideMenu .menu-strip { z-index: 1000; }
   top: 100px;
   bottom: 0;
 
-  left: -350px;
+  left: -280px;
   width: 350px;
   max-width: calc(100vw - 30px);
 
