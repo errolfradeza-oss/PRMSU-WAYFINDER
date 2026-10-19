@@ -500,7 +500,7 @@ function initMap() {
     maxZoom: DESIRED_MAX_ZOOM,
     mapId: "fed2c6c31b0e103f3ad2dea0",
     mapTypeId: "hybrid",
-    tilt: 45,
+    //tilt: 45,
     restriction: { latLngBounds: campusBounds, strictBounds: true },
     styles: [{ featureType: "poi", stylers: [{ visibility: "off" }] }],
     mapTypeControl: false,
