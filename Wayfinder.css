@@ -1645,7 +1645,6 @@ body.menu-open.dir-open #sideMenu .menu-strip { z-index: 1000; }
 #dirPanel .dir-strip {
   position: absolute;
   top: 85px;
-  right: -30px;
   width: 30px;
   height: 60px;
   z-index: 3000;
