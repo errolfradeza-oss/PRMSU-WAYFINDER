@@ -1594,13 +1594,59 @@ body.menu-open.dir-open #sideMenu .menu-strip { z-index: 1000; }
 
 /* Keep the existing sliding handle visible */
 
+
+/* FIX: Keep direction strip visible when panel is closed */
+#dirPanel.direction-panel {
+  left: -350px;
+  width: 350px;
+  max-width: calc(100vw - 30px);
+  overflow: visible !important;
+  transition: left 0.35s ease;
+}
+
+#dirPanel.direction-panel.open {
+  left: 0;
+}
+
+/* Direction panel content stays clipped */
+#dirPanel .walk-dir {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Always-visible direction handle */
 #dirPanel .dir-strip {
+  position: absolute;
+  top: 85px;
+  right: -30px;
+
+  width: 30px;
+  height: 60px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   background: #001d47;
   color: #ffbd2a;
+
   border: 1px solid rgba(255, 189, 42, 0.35);
-  border-left: 0;
+  border-left: none;
   border-radius: 0 8px 8px 0;
+
+  cursor: pointer;
+  z-index: 6100;
+
+  box-shadow: 3px 2px 8px rgba(0, 0, 0, 0.2);
+  transition: background 0.2s ease, color 0.2s ease;
 }
+
+#dirPanel .dir-strip:hover {
+  background: #082b5c;
+  color: #ffffff;
+}
+
 
 /* Smaller screens */
 
@@ -1645,15 +1691,12 @@ body.menu-open.dir-open #sideMenu .menu-strip { z-index: 1000; }
 #dirPanel .dir-strip {
   position: absolute;
   top: 85px;
-  right: -30px;
   width: 30px;
   height: 60px;
   z-index: 3000;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   cursor: pointer;
   background: #001d47;
   color: #ffbd2a;
