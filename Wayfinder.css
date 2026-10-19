@@ -1595,11 +1595,16 @@ body.menu-open.dir-open #sideMenu .menu-strip { z-index: 1000; }
 /* Keep the existing sliding handle visible */
 
 
-/* FIX: Keep direction strip visible when panel is closed */
+/* FIX: Match direction strip behavior to menu strip */
 #dirPanel.direction-panel {
+  position: fixed;
+  top: 100px;
+  bottom: 0;
+
   left: -350px;
   width: 350px;
   max-width: calc(100vw - 30px);
+
   overflow: visible !important;
   transition: left 0.35s ease;
 }
@@ -1608,14 +1613,7 @@ body.menu-open.dir-open #sideMenu .menu-strip { z-index: 1000; }
   left: 0;
 }
 
-/* Direction panel content stays clipped */
-#dirPanel .walk-dir {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-/* Always-visible direction handle */
+/* Match the menu strip positioning */
 #dirPanel .dir-strip {
   position: absolute;
   top: 85px;
@@ -1636,17 +1634,32 @@ body.menu-open.dir-open #sideMenu .menu-strip { z-index: 1000; }
   border-radius: 0 8px 8px 0;
 
   cursor: pointer;
-  z-index: 6100;
-
   box-shadow: 3px 2px 8px rgba(0, 0, 0, 0.2);
-  transition: background 0.2s ease, color 0.2s ease;
+  z-index: 6100;
 }
+
+/* Mobile: use the same responsive width logic as the sidebar */
+@media (max-width: 768px) {
+  #dirPanel.direction-panel {
+    width: min(280px, 82vw);
+    max-width: 82vw;
+    left: calc(-1 * min(280px, 82vw));
+  }
+
+  #dirPanel.direction-panel.open {
+    left: 0;
+  }
+
+  #dirPanel .dir-strip {
+    right: -30px;
+  }
+}
+
 
 #dirPanel .dir-strip:hover {
   background: #082b5c;
   color: #ffffff;
 }
-
 
 /* Smaller screens */
 
@@ -1677,40 +1690,6 @@ body.menu-open.dir-open #sideMenu .menu-strip { z-index: 1000; }
     margin: 7px 10px 8px;
     padding: 11px 12px;
   }
-}
-
-/* FIX: Keep the slide-out handle visible */
-#dirPanel.direction-panel {
-  overflow: visible !important;
-}
-
-#dirPanel .walk-dir {
-  overflow: hidden;
-}
-
-#dirPanel .dir-strip {
-  position: absolute;
-  top: 85px;
-  width: 30px;
-  height: 60px;
-  z-index: 3000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  background: #001d47;
-  color: #ffbd2a;
-  border-radius: 0 10px 10px 0;
-  box-shadow: 3px 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-#dirPanel .dir-strip {
-  transition: background 0.2s ease, color 0.2s ease;
-}
-
-#dirPanel .dir-strip:hover {
-  background: #082b5c;
-  color: #ffffff;
 }
 
 
