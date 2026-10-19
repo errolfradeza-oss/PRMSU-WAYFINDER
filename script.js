@@ -733,6 +733,7 @@ function getUserLocation() {
 }
 //for accessibility features
 function nearestComfortRoom() {
+  closeSideMenu();
 if (!userLocation) {
         alert("Current location not available.");
         return;

@@ -412,7 +412,7 @@ const locations = [
     title: "PRMSU Dormitory",
     icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
     image: "internal/DORM.jpg",
-    overview: "Dorm ng PRMSU ano pa ba?",
+    overview: "PRMSU Dormitory overview info.",
     about: {
   sections: [
     {

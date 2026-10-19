@@ -215,8 +215,8 @@ html, body{
 .side-menu{
   position: fixed;
   top: 100px;
-  left: -250px;
-  width: 250px;
+  left: -350px;
+  width: 350px;
   height: calc(100vh - 100px);
   background: white;
   box-shadow: 3px 0 20px rgba(0,0,0,0.3);
@@ -1682,8 +1682,8 @@ body.menu-open.dir-open #sideMenu .menu-strip { z-index: 1000; }
 .side-menu {
   position: fixed;
   top: 100px;
-  left: -250px;
-  width: 250px;
+  left: -350px;
+  width: 350px;
   height: calc(100vh - 100px);
 
   background: #ffffff;
